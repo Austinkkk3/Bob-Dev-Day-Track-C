@@ -3,7 +3,7 @@
 
 ## 😩 Sound Familiar?
 
-You just got back from a business trip. You have a pile of receipts — hotel invoices, flight confirmations, restaurant bills, all in different formats, from different vendors, with different layouts.
+You just got back from a business trip. You have a pile of receipts, hotel invoices, flight confirmations, restaurant bills, all in different formats, from different vendors, with different layouts.
 
 Now you have to:
 - Open each one manually
