@@ -242,6 +242,25 @@ ai-travel-expense-tracker/
 └── app.py                 # Streamlit UI
 ```
 
+
+
+## 🎉 You Built It — What's Next?
+
+Now that your tracker is running, try using Bob's **Plan Mode** 
+to extend it further.
+
+Some ideas to explore:
+
+- 💬 Add an AI chat assistant that answers questions about your expenses
+- 🗄️ Connect a database to store receipts across sessions (Astra DB)
+- 📧 Auto-generate an expense report email
+- 🚨 Add a policy checker that flags expenses over a certain amount
+- 🌍 Add currency conversion for international receipts
+
+**How to use Plan Mode:**
+Open Bob → switch to **Plan** → describe what you want to add →
+Bob will map out the approach before writing any code.
+It's great for features you're not sure how to structure yet.
 ---
 
 ## Reference
