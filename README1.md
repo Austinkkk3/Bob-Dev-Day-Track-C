@@ -266,7 +266,7 @@ It's great for features you're not sure how to structure yet.
 ## Reference
 
 - 📋 [Cheat Sheet](cheat-sheet.md) — Bob prompts, credentials, troubleshooting
-- 🔧 [env.Template](env.template/) — Pre-formatted credentials file
+- 🔧 [env.Template](env.template.) — Pre-formatted credentials file
 - 📄 [Invoice](Invoice/) — Test PDFs to try the app
 - 💡 [Solution](solution/) — Reference implementation if you get stuck
 
