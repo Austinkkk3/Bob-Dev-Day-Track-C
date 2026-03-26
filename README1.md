@@ -3,7 +3,7 @@
 
 ## 😩 Sound Familiar?
 
-You just got back from a business trip. You have a pile of receipts — hotel folios, flight confirmations, restaurant bills — all in different formats, from different vendors, with different layouts.
+You just got back from a business trip. You have a pile of receipts — hotel invoices, flight confirmations, restaurant bills, all in different formats, from different vendors, with different layouts.
 
 Now you have to:
 - Open each one manually
@@ -18,11 +18,11 @@ It's tedious, error-prone, and nobody enjoys it. For a typical 3-day trip, this 
 
 ## 💡 What If AI Could Do This For You?
 
-That's exactly what you're going to build today — an app that reads your receipts and does all the extraction automatically.
+That's exactly what you're going to build today, an app that reads your receipts and does all the extraction automatically.
 
 More importantly, you're going to build it **using IBM Bob** as your AI coding assistant. You won't be copy-pasting code from tutorials. Instead, you'll describe what you want in plain English, and Bob will generate the code for you.
 
-This is what AI-assisted development looks like in practice — and it's the skill this lab is designed to teach.
+This is what AI-assisted development looks like in practice, and it's the skill this lab is designed to teach.
 
 ---
 
