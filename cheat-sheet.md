@@ -8,7 +8,7 @@
 
 1. [What You're Building](#1-what-youre-building)
 2. [Before You Start — Checklist](#2-before-you-start--checklist)
-3. [Get Your IBM Credentials](#3-get-your-ibm-credentials)
+3. [Get Your IBM Credentials, API Keys](#3-get-your-ibm-credentials)
 4. [Set Up Your Project Folder](#4-set-up-your-project-folder)
 5. [Bob Prompts — Generate Each File](#5-bob-prompts--generate-each-file)
 6. [Install & Run](#6-install--run)
