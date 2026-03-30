@@ -30,7 +30,7 @@ This guide assumes no prior context. Follow every step to build a working applic
 - **Internet Connection**: Required for first run (downloads ~2GB of ML models)
 - **Disk Space**: At least 5GB free
 
-### Python 3.14 Users — CRITICAL SETUP
+### Python 3.14 Users — CRITICAL SETUP （Ignore if your are not using 3.14)
 
 If you're using Python 3.14, you **MUST** follow this exact sequence:
 
