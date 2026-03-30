@@ -268,11 +268,11 @@ Document type detection (from filename, case-insensitive):
 - flight: keywords flight, airline, boarding, airways → doc_type = "flight"
 - meal: keywords meal, restaurant, food, dining, cafe, bistro → doc_type = "meal"
 - car: keywords car, rental, vehicle, hertz, avis, enterprise → doc_type = "car"
-- Default fallback (no keyword match): "hotel"
+- Default fallback (no keyword match): "generic"
 - Hotel keywords take highest priority
 
 LLM extraction:
-- Write a separate extraction prompt for each of the 4 document types
+- Write a separate extraction prompt for each of the 5 document types (hotel, flight, meal, car, generic)
 - Each prompt asks the LLM to return ONLY a JSON array (no markdown, no explanation)
 - Each extracted row must have these fields:
     date (YYYY-MM-DD), vendor, doc_type, category, description, currency, amount, confidence (0.0-1.0)
@@ -280,6 +280,7 @@ LLM extraction:
 - Categories for flight: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Miscellaneous
 - Categories for meal: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Miscellaneous
 - Categories for car: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Miscellaneous
+- For generic: extract ALL line items from mixed travel invoices (e.g. travel agency invoices). For each row, detect doc_type from the content itself — must be one of "Hotel", "Flight", "Meal", "Car Rental". Use all categories from all 4 types combined.
 
 Amount parsing:
 - Handle currency symbols: $, €, £, ¥, ₹
@@ -302,10 +303,6 @@ Output:
 - All charts: transparent background, Inter font
 
 Return only the complete Python file with no explanations.
-```
-
-Save Bob's output as `doc_processing.py`.
-
 ---
 
 ## Step 6: Generate `app.py` with Bob
