@@ -112,7 +112,13 @@ ai-travel-expense-tracker/
 ## Step 1: Create Your Project Folder
 
 ```bash
+# Navigate to your Desktop (easy to find later)
+cd ~/Desktop
+
+# Create the project folder
 mkdir ai-travel-expense-tracker
+
+# Enter the folder
 cd ai-travel-expense-tracker
 ```
 > 💡 **Important**: Every time you open a new Terminal window, you must run this command first before doing anything else:
@@ -127,34 +133,58 @@ cd ai-travel-expense-tracker
 Create a file named `requirements.txt` with this exact content:
 
 ```
+cat > requirements.txt << 'EOF'
 streamlit
 pandas
 plotly
 docling
 python-dotenv
 requests
+EOF
 ```
 
 ---
 
 ## Step 3: Create `.env` File
 
-Copy `env.template` from the repo and rename it to `.env`:
+First, make sure you are in your project folder:
 ```bash
-cp env.template .env
-```
+cd ~/Desktop/ai-travel-expense-tracker
 
-> ⚠️ If your file downloaded as `env (1).template` (with a number in brackets), run this instead:
-> ```bash
-> cp "env (1).template" .env
-> ```
-
-Then open it to fill in your credentials — on Mac run `open -e .env`, on Windows run `notepad .env`. Replace the placeholder values with your real credentials from Steps 1 and 2 above, and update `CLOUD_URL` if you're not in US South (see region table in the [Cheat Sheet](cheat-sheet.md#3c-find-your-region-url)):
-```env
+Then run this command to create the file:
+```bash
+cat > .env << 'EOF'
 API_KEY=paste_your_api_key_here
 PROJECT_ID=paste_your_project_id_here
 CLOUD_URL=https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
+EOF
+
+No output means it worked. Verify the file was created:
+```bash
+cat .env
+```
+You should see the four lines above.
+
+3d. Fill In Your Real Credentials
+Open the file in a text editor:
+```bash
+# Mac
+open -e .env
+
+# Windows
+notepad .env
+
+Replace the placeholder values with your real credentials:
+env
+API_KEY=your_actual_api_key_here
+PROJECT_ID=your_actual_project_id_here
+CLOUD_URL=https://us-south.ml.cloud.ibm.com
+LLM_NAME=ibm/granite-3-8b-instruct
+> ⚠️ If your file downloaded as `env (1).template` (with a number in brackets), run this instead:
+> ```bash
+> cp "env (1).template" .env
+> ```
 ```
 
 > 🔒 **Security Note**: Never commit `.env` to version control. Add it to `.gitignore`.
