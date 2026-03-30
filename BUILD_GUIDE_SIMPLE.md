@@ -152,14 +152,13 @@ First, make sure you are in your project folder:
 cd ~/Desktop/ai-travel-expense-tracker
 
 Then run this command to create the file:
-```bash
 cat > .env << 'EOF'
 API_KEY=paste_your_api_key_here
 PROJECT_ID=paste_your_project_id_here
 CLOUD_URL=https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
 EOF
-
+```
 No output means it worked. Verify the file was created:
 ```bash
 cat .env
@@ -174,13 +173,14 @@ open -e .env
 
 # Windows
 notepad .env
-
+```
 Replace the placeholder values with your real credentials:
-env
+```bash
 API_KEY=your_actual_api_key_here
 PROJECT_ID=your_actual_project_id_here
 CLOUD_URL=https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
+```
 > ⚠️ If your file downloaded as `env (1).template` (with a number in brackets), run this instead:
 > ```bash
 > cp "env (1).template" .env
