@@ -115,7 +115,11 @@ ai-travel-expense-tracker/
 mkdir ai-travel-expense-tracker
 cd ai-travel-expense-tracker
 ```
-
+> 💡 **Important**: Every time you open a new Terminal window, you must run this command first before doing anything else:
+> ```bash
+> cd "/path/to/your/project-folder"
+> ```
+> If you skip this step, all subsequent commands will fail with "module not found" or "file not found" errors.
 ---
 
 ## Step 2: Create `requirements.txt`
@@ -135,8 +139,17 @@ requests
 
 ## Step 3: Create `.env` File
 
-Copy `env.template` from the repo and rename it to `.env`, then fill in your credentials:
+Copy `env.template` from the repo and rename it to `.env`:
+```bash
+cp env.template .env
+```
 
+> ⚠️ If your file downloaded as `env (1).template` (with a number in brackets), run this instead:
+> ```bash
+> cp "env (1).template" .env
+> ```
+
+Then open it to fill in your credentials — on Mac run `open -e .env`, on Windows run `notepad .env`. Replace the placeholder values with your real credentials from Steps 1 and 2 above, and update `CLOUD_URL` if you're not in US South (see region table in the [Cheat Sheet](cheat-sheet.md#3c-find-your-region-url)):
 ```env
 API_KEY=paste_your_api_key_here
 PROJECT_ID=paste_your_project_id_here
@@ -144,10 +157,8 @@ CLOUD_URL=https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
 ```
 
-Replace the placeholder values with your real credentials from Steps 1 and 2 above.
-Update `CLOUD_URL` if you're not in US South.
-
 > 🔒 **Security Note**: Never commit `.env` to version control. Add it to `.gitignore`.
+
 
 ---
 
@@ -328,7 +339,7 @@ Replace `YOUR_API_KEY` with your actual key. Expected output: `200`
 ### 3. Test All Imports
 
 ```bash
-python3 -c "import streamlit, pandas, plotly, docling, requests; print('✅ All OK')"
+python3 -c "import streamlit, pandas, plotly, docling, requests, dotenv; print('✅ All OK')"
 # Expected: ✅ All OK
 ```
 
