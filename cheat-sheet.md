@@ -350,7 +350,14 @@ Please fix the issue and return the corrected complete file.
 ## 6. Install & Run
 
 ### Step 1 — Validate before installing
-
+```
+> 🔴 **Every time you open a new Terminal window**, run this first:
+> ```bash
+> cd "/path/to/your/project-folder"
+> ```
+> Example: `cd "/Users/yourname/Desktop/Test Bob"`
+> Skipping this is the #1 cause of "module not found" and "file not found" errors.
+```
 Run these checks first. They catch the most common problems before you waste time installing.
 
 **Check Python version:**
@@ -460,6 +467,8 @@ Once the app is running:
 | First run takes forever | Docling downloading models | This is normal — wait 5–10 min, don't interrupt |
 | `.env` file not found | File hidden or wrong name | Make sure the file is called `.env` (not `env.txt` or `.env.txt`) |
 | `PROJECT_ID` not working | Wrong value copied | Should be 36 characters with dashes: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
+| `AttributeError: object has no attribute 'getvalue'` | Bob generated code using getvalue() instead of read() | Ask Bob to fix: "In doc_processing.py, replace all instances of getvalue() with read() in the process_invoices function" |
+| `ValidationError: Unexpected keyword argument do_ocr` | Bob passed Docling options to the wrong place | Ask Bob to fix using PdfPipelineOptions — paste this prompt: "Fix _pdf_to_markdown in doc_processing.py to use PdfPipelineOptions instead of passing do_ocr and do_table_structure to converter.convert()" |
 
 ---
 
