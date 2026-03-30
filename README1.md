@@ -57,7 +57,8 @@ You will use **IBM Bob** to generate all the code from scratch. No copy-pasting 
 | Stable internet | Required for model downloads and API calls |
 
 > ⚠️ **Python 3.14 users**: Special setup required — see the [Cheat Sheet](cheat-sheet.md#python-314-setup).
-
+```
+> 💡 **Tip**: Every time you open a new Terminal window during the lab, run `cd` to navigate back to your project folder first.
 ### Credentials you'll need
 
 You need two things from IBM Cloud before writing any code:
