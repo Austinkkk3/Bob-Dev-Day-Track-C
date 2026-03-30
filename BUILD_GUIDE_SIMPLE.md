@@ -193,7 +193,11 @@ LLM_NAME=ibm/granite-3-8b-instruct
 ```
 ## Step 4: Generate `model_gateway.py` with Bob
 
-Open Bob and paste this prompt:
+This file handles the connection to watsonx.ai using the REST API.
+
+💡 Why REST API and not the SDK? The IBM watsonx-ai SDK has compatibility issues with Python 3.14. The REST API works across all supported Python versions.
+
+4a Open Bob and paste this prompt:
 
 ```
 Generate a Python file called model_gateway.py that connects to IBM watsonx.ai using the REST API (not the SDK).
@@ -213,9 +217,22 @@ Requirements:
 Return only the complete Python file with no explanations.
 ```
 
-> 💡 **Why REST API and not the SDK?** The IBM watsonx-ai SDK has compatibility issues with Python 3.14. The REST API works on all Python versions.
 
-Save Bob's output as `model_gateway.py`.
+4b. Save the file
+Click Apply in Bob, or copy the generated code and save it as model_gateway.py in your project folder.
+
+4c: Verify your API Key
+```bash
+curl -s -o /dev/null -w "%{http_code}" \
+  -X POST "https://iam.cloud.ibm.com/identity/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
+```
+Replace YOUR_API_KEY with the value from your .env file.
+Output Meaning
+200✅ API Key is valid 
+400❌ Wrong PROJECT_ID — check it's the 36-character UUID
+401❌ API Key is invalid — contact your lab organizer
 
 ---
 
