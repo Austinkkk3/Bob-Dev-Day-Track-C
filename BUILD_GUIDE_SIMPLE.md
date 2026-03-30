@@ -228,17 +228,32 @@ curl -s -o /dev/null -w "%{http_code}" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
 ```
-Replace YOUR_API_KEY with the value from your .env file.
-Output Meaning
-200✅ API Key is valid 
-400❌ Wrong PROJECT_ID — check it's the 36-character UUID
-401❌ API Key is invalid — contact your lab organizer
+Replace `YOUR_API_KEY` with the value from your `.env` file.
+ 
+| Output | Meaning |
+|--------|---------|
+| `200` | ✅ API Key is valid |
+| `400` | ❌ Wrong `PROJECT_ID` — check it's the 36-character UUID |
+| `401` | ❌ API Key is invalid — contact your lab organizer |
 
+### 4d. Test the watsonx.ai connection
+ 
+```bash
+python3 -c "
+from model_gateway import invoke_llm
+print(invoke_llm('Say hello in one sentence.'))
+"
+```
+ 
+**Expected:** Granite 3 replies with a sentence ✅
+ 
 ---
 
 ## Step 5: Generate `doc_processing.py` with Bob
 
-Open Bob and paste this prompt:
+This file handles PDF parsing and AI-powered data extraction.
+
+###Open Bob and paste this prompt:
 
 ```
 Generate a Python file called doc_processing.py for processing travel expense PDF receipts.
