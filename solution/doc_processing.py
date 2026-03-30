@@ -20,44 +20,40 @@ def _detect_doc_type(filename: str) -> str:
     meal_keywords = ["meal", "restaurant", "food", "dining", "cafe", "bistro"]
     car_keywords = ["car", "rental", "vehicle", "hertz", "avis", "enterprise"]
     
-    if any(keyword in filename_lower for keyword in flight_keywords):
+    # Hotel keywords take highest priority
+    if any(keyword in filename_lower for keyword in hotel_keywords):
+        return "hotel"
+    elif any(keyword in filename_lower for keyword in flight_keywords):
         return "flight"
     elif any(keyword in filename_lower for keyword in meal_keywords):
         return "meal"
     elif any(keyword in filename_lower for keyword in car_keywords):
         return "car"
-    elif any(keyword in filename_lower for keyword in hotel_keywords):
-        return "hotel"
     else:
-        return "hotel"
+        return "generic"
 
 
 def _pdf_to_markdown(pdf_bytes: bytes) -> str:
     """Convert PDF bytes to Markdown using Docling."""
-    # Create temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(pdf_bytes)
         tmp_path = tmp_file.name
     
     try:
-        # Configure pipeline options
         pipeline_options = PdfPipelineOptions()
         pipeline_options.do_ocr = False
         pipeline_options.do_table_structure = True
         
-        # Create converter with options
         converter = DocumentConverter(
             format_options={
                 InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
             }
         )
         
-        # Convert PDF to Markdown
         result = converter.convert(tmp_path)
         markdown_text = result.document.export_to_markdown()
         return markdown_text
     finally:
-        # Clean up temp file
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)
 
@@ -71,11 +67,11 @@ def _get_extraction_prompt(doc_type: str, markdown_text: str) -> str:
 Return ONLY a JSON array with no markdown formatting, no code blocks, and no explanation.
 
 Each object must have these fields:
-- date: check-in or transaction date (YYYY-MM-DD format)
+- date: transaction date (YYYY-MM-DD format)
 - vendor: hotel name
-- doc_type: "hotel"
-- category: "Accommodation"
-- description: room type and nights stayed
+- doc_type: "Hotel"
+- category: one of "Room", "Food & Beverage", "Parking", "Spa & Wellness", "Taxes & Fees", "Telephone", "Laundry", "Minibar", "Miscellaneous"
+- description: item description
 - currency: currency code (e.g., USD, CAD)
 - amount: total amount as positive number
 - confidence: confidence score 0.0-1.0
@@ -93,9 +89,9 @@ Return ONLY a JSON array with no markdown formatting, no code blocks, and no exp
 Each object must have these fields:
 - date: flight date (YYYY-MM-DD format)
 - vendor: airline name
-- doc_type: "flight"
-- category: "Transportation"
-- description: flight route and class
+- doc_type: "Flight"
+- category: one of "Airfare", "Baggage Fee", "Seat Upgrade", "Travel Insurance", "Change Fee", "Miscellaneous"
+- description: flight details
 - currency: currency code (e.g., USD, CAD)
 - amount: total amount as positive number
 - confidence: confidence score 0.0-1.0
@@ -113,9 +109,9 @@ Return ONLY a JSON array with no markdown formatting, no code blocks, and no exp
 Each object must have these fields:
 - date: meal date (YYYY-MM-DD format)
 - vendor: restaurant name
-- doc_type: "meal"
-- category: "Meals"
-- description: meal type or items
+- doc_type: "Meal"
+- category: one of "Breakfast", "Lunch", "Dinner", "Coffee & Snacks", "Alcohol", "Miscellaneous"
+- description: meal details
 - currency: currency code (e.g., USD, CAD)
 - amount: total amount as positive number
 - confidence: confidence score 0.0-1.0
@@ -125,17 +121,43 @@ Receipt text:
 
 Return only the JSON array:"""
 
-    else:  # car
+    elif doc_type == "car":
         return f"""Extract expense information from this car rental receipt.
 
 Return ONLY a JSON array with no markdown formatting, no code blocks, and no explanation.
 
 Each object must have these fields:
-- date: rental start date (YYYY-MM-DD format)
+- date: rental date (YYYY-MM-DD format)
 - vendor: rental company name
-- doc_type: "car"
-- category: "Transportation"
-- description: vehicle type and rental period
+- doc_type: "Car Rental"
+- category: one of "Base Rental", "Fuel", "Insurance", "Toll Charges", "GPS & Equipment", "Taxes & Fees", "Miscellaneous"
+- description: rental details
+- currency: currency code (e.g., USD, CAD)
+- amount: total amount as positive number
+- confidence: confidence score 0.0-1.0
+
+Receipt text:
+{markdown_text}
+
+Return only the JSON array:"""
+
+    else:  # generic
+        return f"""Extract ALL line items from this mixed travel invoice.
+
+Return ONLY a JSON array with no markdown formatting, no code blocks, and no explanation.
+
+For each line item, detect the doc_type from the content itself. It must be one of: "Hotel", "Flight", "Meal", "Car Rental".
+
+Each object must have these fields:
+- date: transaction date (YYYY-MM-DD format)
+- vendor: vendor name
+- doc_type: one of "Hotel", "Flight", "Meal", "Car Rental" (detect from content)
+- category: appropriate category based on doc_type:
+  * Hotel: "Room", "Food & Beverage", "Parking", "Spa & Wellness", "Taxes & Fees", "Telephone", "Laundry", "Minibar", "Miscellaneous"
+  * Flight: "Airfare", "Baggage Fee", "Seat Upgrade", "Travel Insurance", "Change Fee", "Miscellaneous"
+  * Meal: "Breakfast", "Lunch", "Dinner", "Coffee & Snacks", "Alcohol", "Miscellaneous"
+  * Car Rental: "Base Rental", "Fuel", "Insurance", "Toll Charges", "GPS & Equipment", "Taxes & Fees", "Miscellaneous"
+- description: item description
 - currency: currency code (e.g., USD, CAD)
 - amount: total amount as positive number
 - confidence: confidence score 0.0-1.0
@@ -146,9 +168,36 @@ Receipt text:
 Return only the JSON array:"""
 
 
+def _parse_amount(amount_str: str) -> float:
+    """Parse amount string handling various formats."""
+    # Remove currency symbols
+    amount_str = re.sub(r'[$€£¥₹]', '', str(amount_str))
+    
+    # Handle European format (1.234,56)
+    if ',' in amount_str and '.' in amount_str:
+        if amount_str.rindex(',') > amount_str.rindex('.'):
+            # European format
+            amount_str = amount_str.replace('.', '').replace(',', '.')
+        else:
+            # US format
+            amount_str = amount_str.replace(',', '')
+    elif ',' in amount_str:
+        # Could be European decimal or US thousands separator
+        if amount_str.count(',') == 1 and len(amount_str.split(',')[1]) == 2:
+            # European decimal
+            amount_str = amount_str.replace(',', '.')
+        else:
+            # US thousands separator
+            amount_str = amount_str.replace(',', '')
+    
+    try:
+        return abs(float(amount_str))
+    except ValueError:
+        return 0.0
+
+
 def _parse_json_from_llm(llm_output: str) -> list:
     """Extract JSON array from LLM output using regex."""
-    # Find JSON array pattern
     match = re.search(r'\[.*\]', llm_output, re.DOTALL)
     if not match:
         return []
@@ -157,10 +206,10 @@ def _parse_json_from_llm(llm_output: str) -> list:
         json_str = match.group(0)
         data = json.loads(json_str)
         
-        # Apply abs() to amounts
+        # Apply abs() to amounts and parse them
         for item in data:
             if 'amount' in item:
-                item['amount'] = abs(float(item['amount']))
+                item['amount'] = _parse_amount(item['amount'])
         
         return data
     except (json.JSONDecodeError, ValueError):
@@ -183,30 +232,19 @@ def process_invoices(uploaded_files) -> pd.DataFrame:
         filename = file.name
         pdf_bytes = file.getvalue()
         
-        # Detect document type
         doc_type = _detect_doc_type(filename)
-        
-        # Convert PDF to Markdown
         markdown_text = _pdf_to_markdown(pdf_bytes)
-        
-        # Generate extraction prompt
         prompt = _get_extraction_prompt(doc_type, markdown_text)
-        
-        # Call LLM
         llm_output = invoke_llm(prompt)
-        
-        # Parse JSON
         expenses = _parse_json_from_llm(llm_output)
         all_expenses.extend(expenses)
     
-    # Create DataFrame
     if not all_expenses:
         return pd.DataFrame(columns=['Date', 'Vendor', 'Doc Type', 'Category', 
                                     'Description', 'Currency', 'Amount', 'Confidence'])
     
     df = pd.DataFrame(all_expenses)
     
-    # Rename columns to match output format
     column_mapping = {
         'date': 'Date',
         'vendor': 'Vendor',
@@ -249,7 +287,10 @@ def analyze_invoices(df: pd.DataFrame) -> tuple:
         xaxis_title='Amount',
         yaxis_title='Vendor',
         height=400,
-        showlegend=False
+        showlegend=False,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(family='Inter')
     )
     
     # 2. Donut chart by category
@@ -265,7 +306,10 @@ def analyze_invoices(df: pd.DataFrame) -> tuple:
     
     category_chart.update_layout(
         title='Expenses by Category',
-        height=400
+        height=400,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(family='Inter')
     )
     
     # 3. Bar chart by doc type with specific colors
@@ -275,10 +319,10 @@ def analyze_invoices(df: pd.DataFrame) -> tuple:
         'hotel': '#3B82F6',
         'flight': '#A855F7',
         'meal': '#10B981',
-        'car': '#F59E0B'
+        'car rental': '#F59E0B'
     }
     
-    colors = [color_map.get(doc_type.lower(), '#3B82F6') for doc_type in doc_type_totals.index]
+    colors = [color_map.get(str(doc_type).lower(), '#3B82F6') for doc_type in doc_type_totals.index]
     
     doc_type_chart = go.Figure(data=[
         go.Bar(
@@ -293,7 +337,10 @@ def analyze_invoices(df: pd.DataFrame) -> tuple:
         xaxis_title='Document Type',
         yaxis_title='Amount',
         height=400,
-        showlegend=False
+        showlegend=False,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(family='Inter')
     )
     
     return vendor_chart, category_chart, doc_type_chart
