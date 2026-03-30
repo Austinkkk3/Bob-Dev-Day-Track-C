@@ -182,15 +182,13 @@ CLOUD_URL=https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
 ```
 > ⚠️ If your file downloaded as `env (1).template` (with a number in brackets), run this instead:
-> ```bash
+```bash
 > cp "env (1).template" .env
-> ```
 ```
-
 > 🔒 **Security Note**: Never commit `.env` to version control. Add it to `.gitignore`.
 
 ---
-```
+
 ## Step 4: Generate `model_gateway.py` with Bob
 
 This file handles the connection to watsonx.ai using the REST API.
