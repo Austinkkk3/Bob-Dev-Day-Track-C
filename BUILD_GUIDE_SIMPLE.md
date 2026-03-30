@@ -189,9 +189,8 @@ LLM_NAME=ibm/granite-3-8b-instruct
 
 > 🔒 **Security Note**: Never commit `.env` to version control. Add it to `.gitignore`.
 
-
 ---
-
+```
 ## Step 4: Generate `model_gateway.py` with Bob
 
 Open Bob and paste this prompt:
