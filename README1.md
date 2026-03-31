@@ -49,13 +49,14 @@ right now inside IBM.
 
 | File / Folder | Description |
 |---------------|-------------|
-| `LAB_GUIDE.md` | Step-by-step lab guide — start here |
-| `LAB2_BONUS.md` | Bonus lab — add budget tracking to your app |
-| `BUILD_GUIDE.md` | Full technical reference with all Bob prompts |
+| `BUILD_GUIDE_SIMPLE.md` | Step by Step Full technical reference with all Bob prompts |
+| `LAB2.md` | Bonus lab — add budget tracking to your app |
+| `LAB3.md` | Increase Your UI Design|
 | `CHEAT_SHEET.md` | Quick reference — credentials, commands, fixes |
 | `env.template` | Credentials file template |
-| `sample-receipts/` | Sample PDFs to test your app |
+| `Invoice/` | Sample PDFs to test your app |
 | `solution/` | Reference implementation if you get stuck |
+|`Requirements.txt/`| Every neccessary tools you need for this project|
 
 ---
 ## 🎉 You Built It — What's Next?
