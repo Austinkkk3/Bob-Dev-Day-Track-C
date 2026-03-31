@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="AI Travel Expense Tracker",
     page_icon="✈️",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Enhanced custom CSS styling
@@ -205,6 +205,63 @@ if 'df' not in st.session_state:
     st.session_state.df = None
 if 'summary' not in st.session_state:
     st.session_state.summary = None
+if 'total_budget' not in st.session_state:
+    st.session_state.total_budget = 5000
+if 'hotel_budget' not in st.session_state:
+    st.session_state.hotel_budget = 2000
+if 'flight_budget' not in st.session_state:
+    st.session_state.flight_budget = 1500
+if 'meal_budget' not in st.session_state:
+    st.session_state.meal_budget = 800
+if 'car_budget' not in st.session_state:
+    st.session_state.car_budget = 700
+
+# Sidebar - Budget Settings
+with st.sidebar:
+    st.markdown("### 💰 Budget Settings")
+    
+    st.session_state.total_budget = st.number_input(
+        "Total Trip Budget",
+        min_value=0,
+        value=st.session_state.total_budget,
+        step=100,
+        format="%d",
+        help="Set your overall trip budget"
+    )
+    
+    st.markdown("#### Per-Category Budgets")
+    
+    st.session_state.hotel_budget = st.number_input(
+        "Hotel Budget",
+        min_value=0,
+        value=st.session_state.hotel_budget,
+        step=100,
+        format="%d"
+    )
+    
+    st.session_state.flight_budget = st.number_input(
+        "Flight Budget",
+        min_value=0,
+        value=st.session_state.flight_budget,
+        step=100,
+        format="%d"
+    )
+    
+    st.session_state.meal_budget = st.number_input(
+        "Meal Budget",
+        min_value=0,
+        value=st.session_state.meal_budget,
+        step=100,
+        format="%d"
+    )
+    
+    st.session_state.car_budget = st.number_input(
+        "Car Rental Budget",
+        min_value=0,
+        value=st.session_state.car_budget,
+        step=100,
+        format="%d"
+    )
 
 
 def generate_summary(df: pd.DataFrame) -> str:
@@ -365,6 +422,52 @@ if st.session_state.df is not None and not st.session_state.df.empty:
         )
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # Budget Summary Section
+    st.markdown("---")
+    st.markdown('<p class="section-header">💰 Budget Tracking</p>', unsafe_allow_html=True)
+    
+    total_spent = df['Amount'].sum()
+    total_budget = st.session_state.total_budget
+    budget_percentage = (total_spent / total_budget * 100) if total_budget > 0 else 0
+    
+    # Progress bar and status
+    st.markdown(f"**Total Trip Budget:** Spent ${total_spent:,.2f} of ${total_budget:,.2f} budget ({budget_percentage:.1f}%)")
+    st.progress(min(total_spent / total_budget, 1.0) if total_budget > 0 else 0)
+    
+    # Budget status alerts
+    if total_spent > total_budget:
+        overspend = total_spent - total_budget
+        st.error(f"⚠️ Over budget by ${overspend:,.2f}")
+    elif budget_percentage >= 80:
+        st.warning("⚠️ Approaching budget limit")
+    else:
+        st.success("✅ Within budget")
+    
+    # Per-category budget alerts
+    st.markdown("#### Category Budget Status")
+    
+    category_budgets = {
+        'Hotel': st.session_state.hotel_budget,
+        'Flight': st.session_state.flight_budget,
+        'Meal': st.session_state.meal_budget,
+        'Car Rental': st.session_state.car_budget
+    }
+    
+    for category, budget in category_budgets.items():
+        category_spent = df[df['Doc Type'] == category]['Amount'].sum() if category in df['Doc Type'].values else 0
+        
+        if category_spent > budget and budget > 0:
+            st.error(f"⚠️ {category} over budget: spent ${category_spent:,.2f} of ${budget:,.2f}")
+        else:
+            col_cat1, col_cat2 = st.columns([3, 1])
+            with col_cat1:
+                st.markdown(f"**{category}:** ${category_spent:,.2f} / ${budget:,.2f}")
+                if budget > 0:
+                    st.progress(min(category_spent / budget, 1.0))
+            with col_cat2:
+                percentage = (category_spent / budget * 100) if budget > 0 else 0
+                st.markdown(f"<div style='text-align: right; padding-top: 8px;'>{percentage:.1f}%</div>", unsafe_allow_html=True)
+    
     # Styled dataframe with emoji headers
     st.markdown("---")
     st.markdown('<p class="section-header">📋 Expense Details</p>', unsafe_allow_html=True)
@@ -403,21 +506,54 @@ if st.session_state.df is not None and not st.session_state.df.empty:
         st.markdown("---")
         st.markdown('<p class="section-header">📈 Analytics Dashboard</p>', unsafe_allow_html=True)
         with st.spinner("📊 Generating interactive charts..."):
-            vendor_chart, category_chart, doc_type_chart = analyze_invoices(df)
+            # Pass category budgets to analyze_invoices
+            category_budgets = {
+                'Hotel': st.session_state.hotel_budget,
+                'Flight': st.session_state.flight_budget,
+                'Meal': st.session_state.meal_budget,
+                'Car Rental': st.session_state.car_budget
+            }
+            result = analyze_invoices(df, category_budgets)
         
-        chart_col1, chart_col2, chart_col3 = st.columns(3)
-        
-        with chart_col1:
-            st.markdown("**💼 Spending by Vendor**")
-            st.plotly_chart(vendor_chart, use_container_width=True)
-        
-        with chart_col2:
-            st.markdown("**🏷️ Spending by Category**")
-            st.plotly_chart(category_chart, use_container_width=True)
-        
-        with chart_col3:
-            st.markdown("**📄 Spending by Document Type**")
-            st.plotly_chart(doc_type_chart, use_container_width=True)
+        # Handle both 3-figure and 4-figure return values
+        if len(result) == 4:
+            vendor_chart, category_chart, doc_type_chart, budget_chart = result
+            
+            chart_col1, chart_col2 = st.columns(2)
+            
+            with chart_col1:
+                st.markdown("**💼 Spending by Vendor**")
+                st.plotly_chart(vendor_chart, use_container_width=True)
+            
+            with chart_col2:
+                st.markdown("**🏷️ Spending by Category**")
+                st.plotly_chart(category_chart, use_container_width=True)
+            
+            chart_col3, chart_col4 = st.columns(2)
+            
+            with chart_col3:
+                st.markdown("**📄 Spending by Document Type**")
+                st.plotly_chart(doc_type_chart, use_container_width=True)
+            
+            with chart_col4:
+                st.markdown("**💰 Budget vs. Actual**")
+                st.plotly_chart(budget_chart, use_container_width=True)
+        else:
+            vendor_chart, category_chart, doc_type_chart = result
+            
+            chart_col1, chart_col2, chart_col3 = st.columns(3)
+            
+            with chart_col1:
+                st.markdown("**💼 Spending by Vendor**")
+                st.plotly_chart(vendor_chart, use_container_width=True)
+            
+            with chart_col2:
+                st.markdown("**🏷️ Spending by Category**")
+                st.plotly_chart(category_chart, use_container_width=True)
+            
+            with chart_col3:
+                st.markdown("**📄 Spending by Document Type**")
+                st.plotly_chart(doc_type_chart, use_container_width=True)
     
     # Generate Summary button logic
     if summary_button:
