@@ -76,6 +76,27 @@ You'll add:
 
 👉 **[Open Lab 2 →](LAB2.md)**
 
+
+## Want a Better Looking App?
+
+The app works out of the box after Lab 1 — but if you want to take the UI
+further, Bob can do that too.
+
+With one additional prompt, you can transform your app from functional to
+polished:
+
+- ✨ Animated hero banner with gradient and fade-in effects
+- 🎴 Metric cards with hover animations and colored accents
+- 🎨 Smooth transitions and hover effects on all buttons
+- 📊 Better data table with scrolling and styled headers
+- 🤖 AI summary displayed in a gradient highlight box
+- 🏷️ Professional footer and cleaner overall layout
+
+No design experience needed. Just paste the prompt into Bob and let it
+handle the rest.
+
+👉 **[UI Enhancement Prompt LAB3 →](LAB3.md)**
+
 **How to use Plan Mode:**
 Open Bob → switch to **Plan** → describe what you want to add →
 Bob will map out the approach before writing any code.
