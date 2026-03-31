@@ -1,4 +1,4 @@
-## 🎉 What's Next — Bonus Lab
+# 🎉 What's Next — Bonus Lab
 
 If you still have time, check out **Lab 2** to extend your tracker with more features using Bob's Plan Mode!
 
