@@ -362,8 +362,9 @@ generate_summary(df) function:
 
 Compute: total amount, number of items, breakdown by category, top vendor and their total, breakdown by doc type
 Try to compute date range and average daily spend from the Date column (handle errors gracefully)
-Build a prompt with these stats and ask the LLM to write a 3-4 sentence professional plain-English summary
-Call invoke_llm(prompt) and return the result
+- Build a prompt with these stats and ask the LLM to write a 3-4 sentence professional plain-English summary. Explicitly instruct the LLM in the prompt: "Do not use any markdown formatting, bullet points, headers, or bold text. Return plain text only."
+- After receiving the LLM response, strip any remaining markdown symbols (**, ##, *, -) before displaying
+Call invoke_llm(prompt), store the result in a variable called summary, and return summary explicitly with a return statement
 
 Do NOT include: Astra DB, database connections, or chat interface.
 Return only the complete Python file with no explanations.
