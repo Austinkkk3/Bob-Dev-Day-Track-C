@@ -260,15 +260,17 @@ def process_invoices(uploaded_files) -> pd.DataFrame:
     return df
 
 
-def analyze_invoices(df: pd.DataFrame) -> tuple:
+def analyze_invoices(df: pd.DataFrame, category_budgets: dict = None) -> tuple:
     """
-    Generate three Plotly visualizations from expense data.
+    Generate Plotly visualizations from expense data.
     
     Args:
         df: DataFrame with expense data
+        category_budgets: Optional dict with budget amounts for each category
         
     Returns:
-        Tuple of (vendor_chart, category_chart, doc_type_chart)
+        Tuple of (vendor_chart, category_chart, doc_type_chart) or
+        (vendor_chart, category_chart, doc_type_chart, budget_chart) if category_budgets provided
     """
     # 1. Horizontal bar chart by vendor
     vendor_totals = df.groupby('Vendor')['Amount'].sum().sort_values()
@@ -342,6 +344,54 @@ def analyze_invoices(df: pd.DataFrame) -> tuple:
         plot_bgcolor='rgba(0,0,0,0)',
         font=dict(family='Inter')
     )
+    
+    # If category_budgets provided, create budget vs actual chart
+    if category_budgets is not None:
+        categories = ['Hotel', 'Flight', 'Meal', 'Car Rental']
+        budgeted = []
+        actual = []
+        colors_actual = []
+        
+        for category in categories:
+            budget = category_budgets.get(category, 0)
+            spent = df[df['Doc Type'] == category]['Amount'].sum() if category in df['Doc Type'].values else 0
+            
+            budgeted.append(budget)
+            actual.append(spent)
+            
+            # Color actual bars: red if over budget, blue if under
+            if spent > budget and budget > 0:
+                colors_actual.append('#EF4444')
+            else:
+                colors_actual.append('#3B82F6')
+        
+        budget_chart = go.Figure(data=[
+            go.Bar(
+                name='Budgeted',
+                x=categories,
+                y=budgeted,
+                marker_color='#94A3B8'
+            ),
+            go.Bar(
+                name='Actual',
+                x=categories,
+                y=actual,
+                marker_color=colors_actual
+            )
+        ])
+        
+        budget_chart.update_layout(
+            title='Budget vs. Actual by Category',
+            xaxis_title='Category',
+            yaxis_title='Amount',
+            height=400,
+            barmode='group',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(family='Inter')
+        )
+        
+        return vendor_chart, category_chart, doc_type_chart, budget_chart
     
     return vendor_chart, category_chart, doc_type_chart
 
