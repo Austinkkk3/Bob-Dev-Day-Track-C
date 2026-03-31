@@ -74,7 +74,7 @@ You'll add:
 - 🚨 **Overspend alerts** that flag in red when you've gone over budget
 - 📊 A **Budget vs. Actual chart** showing exactly where you overspent
 
-👉 **[Open Lab 2 →](BONUS LAB 2.md)**
+👉 **[Open Lab 2 →](BONUS2)**
 
 **How to use Plan Mode:**
 Open Bob → switch to **Plan** → describe what you want to add →
