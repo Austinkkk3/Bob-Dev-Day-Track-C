@@ -303,69 +303,74 @@ Output:
 - All charts: transparent background, Inter font
 
 Return only the complete Python file with no explanations.
----
+```
+----
 
-## Step 6: Generate `app.py` with Bob
+## Step 6 — Generate `app.py` with Bob
 
 Open Bob and paste this prompt:
-
 ```
 Generate a Python file called app.py for a Streamlit web application called "AI Travel Expense Tracker".
-
 Requirements:
-
 Imports:
-- from doc_processing import process_invoices, analyze_invoices
-- from model_gateway import invoke_llm
+
+from doc_processing import process_invoices, analyze_invoices
+from model_gateway import invoke_llm
 
 Page setup:
-- st.set_page_config: title="AI Travel Expense Tracker", page_icon="✈️", layout="wide"
-- Custom CSS: Inter font, background #F1F5F9, white cards with border-radius, hide Streamlit footer
+
+st.set_page_config: title="AI Travel Expense Tracker", page_icon="✈️", layout="wide"
+Custom CSS: Inter font, background #F1F5F9, white cards with border-radius, hide Streamlit footer
 
 Layout:
-- Hero banner: dark gradient background (#0F172A to #1D4ED8), show app title and subtitle
-- Badge in hero: "Powered by IBM watsonx.ai"
-- File uploader: accepts PDF only, up to 10 files
-- Four buttons in a row: Submit (primary), Analyze (secondary), Generate Summary (secondary), Export CSV (download)
+
+Hero banner: dark gradient background (#0F172A to #1D4ED8), show app title and subtitle
+Badge in hero: "Powered by IBM watsonx.ai"
+File uploader: accepts PDF only, up to 10 files
+Four buttons in a row: Submit (primary), Analyze (secondary), Generate Summary (secondary), Export CSV (download)
 
 Session state:
-- st.session_state.df → stores the extracted DataFrame
-- st.session_state.summary → stores the generated summary string
+
+st.session_state.df → stores the extracted DataFrame
+st.session_state.summary → stores the generated summary string
 
 On Submit button click:
-- Call process_invoices(uploaded_files) and store result in st.session_state.df
-- Reset st.session_state.summary to None
-- Show a success message
+
+Call process_invoices(uploaded_files) and store result in st.session_state.df
+Reset st.session_state.summary to None
+Show a success message
 
 Results section (shown when st.session_state.df is not empty):
-- 4 metric cards: Files Processed, Line Items, Total Amount (formatted as $X,XXX.XX), Avg Confidence (as %)
-- Styled dataframe with emoji column headers:
-  📅 Date, 🏢 Vendor, 📄 Doc Type, 🏷️ Category, 📝 Description, 💱 Currency, 💵 Amount, 🎯 Confidence
+
+4 metric cards: Files Processed, Line Items, Total Amount (formatted as $X,XXX.XX), Avg Confidence (as %)
+Styled dataframe with emoji column headers:
+📅 Date, 🏢 Vendor, 📄 Doc Type, 🏷️ Category, 📝 Description, 💱 Currency, 💵 Amount, 🎯 Confidence
 
 On Analyze button click:
-- Call analyze_invoices(st.session_state.df)
-- Show all 3 charts using st.plotly_chart
+
+Call analyze_invoices(st.session_state.df)
+Show all 3 charts using st.plotly_chart
 
 On Generate Summary button click:
-- If no data, show a warning: "Please upload and submit receipts first"
-- Otherwise, call a generate_summary(df) function with st.spinner("✨ Generating AI summary...")
-- Store result in st.session_state.summary
-- Display with st.info()
+
+If no data, show a warning: "Please upload and submit receipts first"
+Otherwise, call a generate_summary(df) function with st.spinner("✨ Generating AI summary...")
+Store result in st.session_state.summary
+Display with st.info()
 
 generate_summary(df) function:
-- Compute: total amount, number of items, breakdown by category, top vendor and their total, breakdown by doc type
-- Try to compute date range and average daily spend from the Date column (handle errors gracefully)
-- Build a prompt with these stats and ask the LLM to write a 3-4 sentence professional plain-English summary
-- Call invoke_llm(prompt) and return the result
+
+Compute: total amount, number of items, breakdown by category, top vendor and their total, breakdown by doc type
+Try to compute date range and average daily spend from the Date column (handle errors gracefully)
+Build a prompt with these stats and ask the LLM to write a 3-4 sentence professional plain-English summary
+Call invoke_llm(prompt) and return the result
 
 Do NOT include: Astra DB, database connections, or chat interface.
-
 Return only the complete Python file with no explanations.
-```
 
 Save Bob's output as `app.py`.
+```
 
----
 
 ## Pre-Run Validation
 
@@ -440,6 +445,48 @@ python3 -m streamlit run app.py
 The app opens automatically at **http://localhost:8501**.
 
 ---
+
+## ✨BONUS LAB 1: If you want to inprove your website's UI design✨
+
+Copy and Paste this prompt into Bob
+```
+I have an existing Streamlit app called app.py for an AI Travel Expense Tracker. I want to significantly improve the UI quality.
+
+Add these enhancements:
+
+1. Enhanced CSS styling:
+- Gradient background for the entire app (#f8fafc to #e2e8f0)
+- Hero banner with gradient (blue tones) and fade-in animation
+- Hover effects on buttons (lift animation with shadow)
+- Hover effects on metric cards (elevation change)
+- Enhanced file uploader with dashed border and hover state
+- Smooth transitions on all interactive elements
+- Custom styled success/warning/error messages with gradients
+- Rounded corners and box shadows throughout
+- Hide Streamlit branding (footer and main menu)
+
+2. Better organization:
+- Add "How it works" instruction section with numbered steps
+- Section headers with custom styling and bottom borders
+- Clear visual separators between sections
+- Add icons to all buttons (🚀 Submit, 📊 Analyze, 🤖 Generate Summary, 💾 Export CSV)
+
+3. Enhanced data display:
+- Metric cards with colored left borders and hover animations
+- Format confidence scores as percentages
+- Add emoji icons to all column headers (📅 Date, 🏢 Vendor, 📄 Doc Type, 🏷️ Category, 📝 Description, 💱 Currency, 💰 Amount, ✅ Confidence)
+- Set dataframe height to 400px for better scrolling
+- Chart titles with descriptive labels
+
+4. Professional touches:
+- AI summary displayed in a beautiful gradient box
+- Professional footer with branding
+- Fade-in animations for content
+- Better typography (improved font sizes, weights, line heights)
+- Text shadows on hero banner for depth
+
+Return the complete modified app.py with all enhancements applied.
+```
 
 ## Usage
 
