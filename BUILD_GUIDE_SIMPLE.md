@@ -34,6 +34,7 @@ This guide assumes no prior context. Follow every step to build a working applic
 
 If you're using Python 3.14, you **MUST** follow this exact sequence:
 
+
 ```bash
 # 1. Install uv package manager
 pip install uv
@@ -68,6 +69,11 @@ Before writing any code, you need two pieces of information from IBM Cloud.
 7. Click **Create**
 8. ⚠️ **Copy the API key immediately** — it's shown only once
 9. Save it securely (you'll paste it into `.env` later)
+<img width="1498" alt="Screenshot 2026-04-06 at 4 13 32 PM" src="https://github.ibm.com/user-attachments/assets/bbd382c4-e7ea-471b-a918-43b73d394a5a" />
+    <img width="1498" alt="screenshot2" src="https://github.ibm.com/user-attachments/assets/8661b9d6-14a0-479f-a918-9e19c9c81d92" />
+<img width="1498" alt="ss3" src="https://github.ibm.com/user-attachments/assets/3617cf3d-b558-4947-91ce-3398a0fdb815" />
+<img width="1498" alt="ss4" src="https://github.ibm.com/user-attachments/assets/a9bacadc-f506-4ef3-b4e7-3fdb485e1c41" />
+
 
 ### Step 2: Get watsonx.ai Project ID
 
