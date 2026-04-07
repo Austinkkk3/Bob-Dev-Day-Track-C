@@ -148,7 +148,18 @@ python-dotenv
 requests
 EOF
 ```
+## Step 2.5: Install Dependencies
 
+After creating requirements.txt, install the packages:
+
+```bash
+pip install -r requirements.txt
+```
+If you get ModuleNotFoundError when running the app later, try:
+
+```bash
+pip3 install -r requirements.txt
+```
 ---
 
 ## Step 3: Create `.env` File
