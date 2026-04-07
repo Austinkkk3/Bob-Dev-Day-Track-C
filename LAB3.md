@@ -1,7 +1,8 @@
 
 ## ✨BONUS LAB 3: Time to Have a Conversation with BOB - If you want to inprove your website's UI design✨
 
-Copy and Paste this prompt into Bob
+Copy and Paste this prompt into Bob and add any features you want Bob to include:
+---
 ```
 I have an existing Streamlit app called app.py for an AI Travel Expense Tracker. I want to significantly improve the UI quality.
 
