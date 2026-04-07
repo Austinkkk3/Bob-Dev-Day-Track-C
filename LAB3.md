@@ -1,5 +1,5 @@
 
-## ✨BONUS LAB 3: If you want to inprove your website's UI design✨
+## ✨BONUS LAB 3: Time to Have a Conversation with BOB - If you want to inprove your website's UI design✨
 
 Copy and Paste this prompt into Bob
 ```
