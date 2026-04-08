@@ -30,6 +30,27 @@ This guide assumes no prior context. Follow every step to build a working applic
 - **Internet Connection**: Required for first run (downloads ~2GB of ML models)
 - **Disk Space**: At least 5GB free
 
+### Installing Python
+
+If you don't have Python installed, follow these steps:
+
+**Mac:**
+1. Go to [python.org/downloads](https://python.org/downloads)
+2. Click **Download Python 3.13.x** (the big yellow button)
+3. Open the downloaded `.pkg` file and follow the installer
+4. When done, open Terminal and run `python3 --version` to confirm
+
+**Windows:**
+1. Go to [python.org/downloads](https://python.org/downloads)
+2. Click **Download Python 3.13.x**
+3. Open the `.exe` file
+4. ⚠️ **Check "Add Python to PATH"** before clicking Install — this is critical
+5. Click **Install Now**
+6. When done, open Command Prompt and run `python --version` to confirm
+
+> 💡 If you see a version number like `Python 3.13.x`, you're good to go.
+> If you see an error, restart your computer and try again.
+
 ### Python 3.14 Users — CRITICAL SETUP （Ignore if your are not using 3.14)
 
 If you're using Python 3.14, you **MUST** follow this exact sequence:
@@ -45,8 +66,18 @@ uv pip install pillow==11.3.0 --only-binary :all:
 # 3. Then install other dependencies
 uv pip install -r requirements.txt
 ```
+---
+```
+> 💡 pip comes bundled with Python 3.13. If `pip3 --version` gives an error,
+> run `python3 -m ensurepip` to install it.
+```
+### Installing IBM Bob
 
-**Why?** Python 3.14 has binary compatibility issues that prevent standard package installation. Installing pillow first with `--only-binary :all:` resolves this blocking issue.
+1. Search for IBM Bob online
+2. Download the IBM Bob installer for your operating system
+3. Open the installer and follow the prompts
+4. Launch Bob — you should see the Bob IDE with the chat panel on the right
+
 
 ### Required Accounts
 
