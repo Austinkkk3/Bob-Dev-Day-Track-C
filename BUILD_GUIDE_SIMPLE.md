@@ -92,17 +92,24 @@ Before writing any code, you need two pieces of information from IBM Cloud.
 ### Step 1: Get IBM Cloud API Key
 
 1. Go to [cloud.ibm.com](https://cloud.ibm.com) and sign in
-2. Click the button on top left corner 
-3. Select WatsonX Studio
-4. Launch in IBM WatsonX 
-5. Find the **Developer Access** section
-6. Give it a name (e.g., `watsonx-expense-tracker`)
-7. ⚠️ **Copy the API key immediately** — it's shown only once
-8. Save it securely (you'll paste it into `.env` later)
-<img width="1498" alt="Screenshot 2026-04-06 at 4 13 32 PM" src="https://github.ibm.com/user-attachments/assets/bbd382c4-e7ea-471b-a918-43b73d394a5a" />
-    <img width="1498" alt="screenshot2" src="https://github.ibm.com/user-attachments/assets/8661b9d6-14a0-479f-a918-9e19c9c81d92" />
-<img width="1498" alt="ss3" src="https://github.ibm.com/user-attachments/assets/3617cf3d-b558-4947-91ce-3398a0fdb815" />
-<img width="1498" alt="ss4" src="https://github.ibm.com/user-attachments/assets/a9bacadc-f506-4ef3-b4e7-3fdb485e1c41" />
+2. Click on the highlighted icon with the arrow. If you expand the display with the hamburger menu
+icon on the top-left, you will see this is the Resource list  
+ <img width="1498" alt="Screenshot 2026-04-06 at 4 13 32 PM" src="https://github.ibm.com/user-attachments/assets/bbd382c4-e7ea-471b-a918-43b73d394a5a" />
+3. Click on the down arrow beside AI/Machine Learning. The window will expand to show multiple
+resources. Click the resource name with the product watsonx.ai Runtime.
+<img width="1151" alt="runtime" src="https://github.ibm.com/user-attachments/assets/d377fc86-6668-45ef-91f8-24d618af412b" />
+
+4. Launch in IBM WatsonX
+ <img width="1498" alt="ss3" src="https://github.ibm.com/user-attachments/assets/3617cf3d-b558-4947-91ce-3398a0fdb815" />
+8. Find the **Developer Access** section
+ <img width="1498" alt="ss4" src="https://github.ibm.com/user-attachments/assets/a9bacadc-f506-4ef3-b4e7-3fdb485e1c41" />
+
+9. Give it a name (e.g., `watsonx-expense-tracker`)
+10. ⚠️ **Copy the API key immediately** — it's shown only once
+11. Save it securely (you'll paste it into `.env` later)
+
+ 
+
 
 
 ### Step 2: Get watsonx.ai Project ID
