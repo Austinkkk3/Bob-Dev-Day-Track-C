@@ -87,7 +87,7 @@ uv pip install -r requirements.txt
 
 ## Get Your Credentials
 
-Before writing any code, you need two pieces of information from IBM Cloud.
+Before writing any code, you need three pieces of information from IBM Cloud.
 
 ### Step 1: Get IBM Cloud API Key
 
