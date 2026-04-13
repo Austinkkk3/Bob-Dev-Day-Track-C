@@ -383,10 +383,13 @@ st.session_state.df → stores the extracted DataFrame
 st.session_state.summary → stores the generated summary string
 
 On Submit button click:
-
-Call process_invoices(uploaded_files) and store result in st.session_state.df
-Reset st.session_state.summary to None
-Show a success message
+- Show a progress bar using st.progress(0) and a status text placeholder
+- Process each file one by one, updating the progress bar and status text 
+  as each file is completed (e.g. "Processing file 2 of 3: marriott_hotel.pdf...")
+- After all files are processed, clear the progress bar and status text
+- Store the combined results in st.session_state.df
+- Reset st.session_state.summary to None
+- Show a success message
 
 Results section (shown when st.session_state.df is not empty):
 
