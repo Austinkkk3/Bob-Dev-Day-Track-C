@@ -8,14 +8,14 @@ This guide assumes no prior context. Follow every step to build a working applic
 
 ## What This Application Does
 
-✅ Upload up to 10 PDF receipts (hotels, flights, meals, car rentals)/
-✅ Auto-detect document type from filename/
-✅ Extract structured expense data using IBM watsonx.ai Granite 3 LLM/
-✅ Display results in a table with 8 columns/
-✅ Show 4 metric cards (Files Processed, Line Items, Total Amount, Avg Confidence)/
-✅ Generate 3 interactive Plotly charts (by vendor, by category, by document type)/
-✅ Export data to CSV/
-✅ Generate an AI-written plain-English summary of your trip expenses/
+✅ Upload up to 10 PDF receipts (hotels, flights, meals, car rentals)  
+✅ Auto-detect document type from filename  
+✅ Extract structured expense data using IBM watsonx.ai Granite 3 LLM  
+✅ Display results in a table with 8 columns  
+✅ Show 4 metric cards (Files Processed, Line Items, Total Amount, Avg Confidence)  
+✅ Generate 4 interactive Plotly charts (by vendor, by category, by document type)  
+✅ Export data to CSV  
+✅ Generate an AI-written plain-English summary of your trip expenses  
 
 
 ---
@@ -92,14 +92,13 @@ Before writing any code, you need two pieces of information from IBM Cloud.
 ### Step 1: Get IBM Cloud API Key
 
 1. Go to [cloud.ibm.com](https://cloud.ibm.com) and sign in
-2. Click your account avatar (top right corner)
-3. Select **Manage** → **Access (IAM)**
-4. In the left sidebar, click **API keys**
-5. Click **Create** button
+2. Click the button on top left corner 
+3. Select WatsonX Studio
+4. Launch in IBM WatsonX 
+5. Find the **Developer Access** section
 6. Give it a name (e.g., `watsonx-expense-tracker`)
-7. Click **Create**
-8. ⚠️ **Copy the API key immediately** — it's shown only once
-9. Save it securely (you'll paste it into `.env` later)
+7. ⚠️ **Copy the API key immediately** — it's shown only once
+8. Save it securely (you'll paste it into `.env` later)
 <img width="1498" alt="Screenshot 2026-04-06 at 4 13 32 PM" src="https://github.ibm.com/user-attachments/assets/bbd382c4-e7ea-471b-a918-43b73d394a5a" />
     <img width="1498" alt="screenshot2" src="https://github.ibm.com/user-attachments/assets/8661b9d6-14a0-479f-a918-9e19c9c81d92" />
 <img width="1498" alt="ss3" src="https://github.ibm.com/user-attachments/assets/3617cf3d-b558-4947-91ce-3398a0fdb815" />
@@ -108,13 +107,11 @@ Before writing any code, you need two pieces of information from IBM Cloud.
 
 ### Step 2: Get watsonx.ai Project ID
 
-1. From IBM Cloud dashboard, go to **Resource List**
-2. Under **AI / Machine Learning**, find your watsonx.ai instance
-3. Click on it, then click **Launch IBM watsonx**
-4. On the watsonx home screen, find the **Developer Access** section
-5. Select your project from the dropdown
-6. Copy the **Project ID** (36-character UUID like `12345678-1234-1234-1234-123456789abc`)
-7. Save it securely
+1. At the same page of where you find the API Key
+2. Select your project from the dropdown
+3. Copy the **Project ID** (36-character UUID like `12345678-1234-1234-1234-123456789abc`)
+4. Save it securely
+5. If you want to go back IBM CLoud Dashboard, simply click the logo in the top left corner
 
 ### Step 3: Note Your Region
 
