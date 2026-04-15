@@ -411,71 +411,180 @@ Return only the complete Python file with no explanations.
 
 Open Bob and paste this prompt:
 ```
-Generate a Python file called app.py for a Streamlit web application called "AI Travel Expense Tracker".
+Generate a complete Python file called app.py for a Streamlit web application named "AI Travel Expense Tracker".
 
 Requirements:
 
 Imports:
+- import streamlit as st
+- import pandas as pd
 - from doc_processing import process_invoices, analyze_invoices
 - from model_gateway import invoke_llm
 
-Page setup:
-- st.set_page_config: title="AI Travel Expense Tracker", page_icon="✈️", layout="wide"
-- Custom CSS: Inter font, background #F1F5F9, white cards with border-radius, hide Streamlit footer
+General rules:
+- Return only the complete Python file content.
+- Do not include explanations.
+- Use only straight ASCII quotes (" and ').
+- Do not use curly quotes.
+- Include all required helper functions directly inside app.py.
+- Do not assume any external helper exists unless explicitly listed below.
+- Do NOT include Astra DB, database connections, authentication, or chat interface.
+- Do NOT include budget sidebar, budget inputs, or budget tracking unless explicitly requested.
+- Keep the code clean, runnable, and self-contained except for the imported modules above.
 
-Layout:
-- Hero banner: dark gradient background (#0F172A to #1D4ED8), show app title and subtitle
-- Badge in hero: "Powered by IBM watsonx.ai"
-- File uploader: accepts PDF only, up to 10 files
-- Four buttons in a row: Submit (primary), Analyze (secondary), Generate Summary (secondary), Export CSV (download)
+Page setup:
+- Use st.set_page_config with:
+  - page_title="AI Travel Expense Tracker"
+  - page_icon="✈️"
+  - layout="wide"
+
+Styling:
+- Add custom CSS using st.markdown(..., unsafe_allow_html=True)
+- Use Inter font
+- App background color: #F1F5F9
+- Cards should have white background, rounded corners, light border, and subtle shadow
+- Hide the Streamlit footer and main menu
+- Create a hero banner with:
+  - dark gradient background from #0F172A to #1D4ED8
+  - app title
+  - short subtitle
+  - a badge reading "Powered by IBM watsonx.ai"
 
 Session state:
-- st.session_state.df → stores the extracted DataFrame
-- st.session_state.summary → stores the generated summary string
+- Initialize:
+  - st.session_state.df = None if not already set
+  - st.session_state.summary = None if not already set
 
-On Submit button click:
-- Show a progress bar using st.progress(0) and a status text placeholder
-- Process each file one by one, updating the progress bar and status text
-  as each file is completed (e.g. "Processing file 2 of 3: marriott_hotel.pdf...")
-- After all files are processed, clear the progress bar and status text
-- Store the combined results in st.session_state.df
-- Reset st.session_state.summary to None
-- Show a success message
+Helper function:
+- Define a function generate_summary(df: pd.DataFrame) -> str inside app.py
+- This function must:
+  - compute total amount
+  - compute number of line items
+  - compute category breakdown as category name + subtotal
+  - compute top vendor and top vendor amount
+  - compute document type breakdown
+  - compute date range and average daily spend
+  - handle date parsing errors gracefully with try/except
+  - build a prompt and send it to invoke_llm()
+  - strip markdown remnants from the model response, including **, ##, *, and leading -
+  - store the cleaned result in a variable named summary
+  - return summary explicitly
 
-Results section (shown when st.session_state.df is not empty):
-- 4 metric cards: Files Processed, Line Items, Total Amount (formatted as $X,XXX.XX), Avg Confidence (as %)
-- Styled dataframe with emoji column headers:
-  📅 Date, 🏢 Vendor, 📄 Doc Type, 🏷️ Category, 📝 Description, 💱 Currency, 💵 Amount, 
+Summary prompt requirements:
+- The prompt inside generate_summary(df) must instruct the LLM exactly as follows in meaning:
+  - You are a corporate travel expense analyst.
+  - Write exactly 3 short sentences.
+  - Cover only:
+    1. total spend and date range
+    2. largest spending category and top vendor
+    3. one specific actionable recommendation to reduce costs
+  - Do not restate every number.
+  - Do not use markdown.
+  - Do not use bullet points.
+  - Do not use headers.
+  - Do not use bold text.
+  - Do not add preamble, commentary, self-evaluation, or revision notes.
+  - Return plain text only.
 
-On Analyze button click:
-- Call analyze_invoices(st.session_state.df)
-- Show all 3 charts using st.plotly_chart
+Main layout:
+- Show hero banner at the top
+- Below the banner, show a file uploader:
+  - label should clearly indicate PDF upload
+  - accept PDF only
+  - allow multiple files
+  - maximum 10 files
+- If more than 10 files are uploaded, show an error and only process the first 10
 
-On Generate Summary button click:
-- If no data, show a warning: "Please upload and submit receipts first"
-- Otherwise, call generate_summary(df) with st.spinner("✨ Generating AI summary...")
-- Store result in st.session_state.summary
-- Display with st.info()
+Buttons:
+- Create exactly 4 controls in one row:
+  1. Submit
+  2. Analyze
+  3. Generate Summary
+  4. Export CSV
+- Submit should be primary
+- Analyze and Generate Summary should be secondary
+- Export CSV should be a download button that appears only when data exists
 
-generate_summary(df) function:
-- Compute these stats from the DataFrame:
-    total amount, number of line items, breakdown by category (category name + subtotal),
-    top vendor and their total, breakdown by doc type, date range, average daily spend
-- Handle date parsing errors gracefully with try/except — do not crash if dates are missing or malformed
-- Build a prompt using the stats above and send it to invoke_llm()
-- The prompt must instruct the LLM:
-    "You are a corporate travel expense analyst. Given the following expense data, write a concise
-    3-sentence summary. Cover only: (1) total spend and date range, (2) largest spending category
-    and top vendor, (3) one specific actionable recommendation to reduce costs.
-    Do not restate all the numbers. Do not use markdown, bullet points, headers, or bold text.
-    Do not add preamble or commentary. Return plain text only."
-- After receiving the LLM response, strip any remaining markdown symbols: **, ##, *, and leading -
-- Store the result in a variable called summary
-- Return summary explicitly with a return statement — do not omit the return
+Submit behavior:
+- When Submit is clicked:
+  - if no files are uploaded, show a warning
+  - otherwise show:
+    - a progress bar created with st.progress(0)
+    - a status text placeholder
+  - call process_invoices(uploaded_files)
+  - if process_invoices supports progress updates, reflect them in the progress bar
+  - otherwise simulate file-by-file progress updates in app.py before or after processing so the UI still shows progress
+  - progress text should read like:
+    - "Processing file 2 of 3: marriott_hotel.pdf..."
+  - after processing completes:
+    - clear the progress bar
+    - clear the status text
+    - store result in st.session_state.df
+    - reset st.session_state.summary to None
+    - show a success message
 
-Do NOT include: Astra DB, database connections, or chat interface.
-Use only straight ASCII quotes (" and ') throughout. Do not use curly or smart quotes.
-Return only the complete Python file with no explanations.
+Results section:
+- Show this section only if st.session_state.df exists and is not empty
+- Display exactly 3 metric cards:
+  1. Files Processed
+  2. Line Items
+  3. Total Amount
+- Total Amount must be formatted as $X,XXX.XX
+
+DataFrame display:
+- Show a styled dataframe with emoji column headers.
+- Use exactly these 7 display columns in this order:
+  - 📅 Date
+  - 🏢 Vendor
+  - 📄 Doc Type
+  - 🏷️ Category
+  - 📝 Description
+  - 💱 Currency
+  - 💵 Amount
+- The displayed dataframe must map from these raw columns:
+  - Date
+  - Vendor
+  - Doc Type
+  - Category
+  - Description
+  - Currency
+  - Amount
+- Do not include Confidence anywhere.
+- Do not reference a Confidence column.
+- Use st.dataframe with wide layout.
+
+Analyze behavior:
+- When Analyze is clicked:
+  - if no processed data exists, show a warning
+  - otherwise call analyze_invoices(st.session_state.df)
+  - display all 3 returned Plotly charts with st.plotly_chart(..., use_container_width=True)
+
+Generate Summary behavior:
+- When Generate Summary is clicked:
+  - if no processed data exists, show a warning with the text:
+    "Please upload and submit receipts first"
+  - otherwise:
+    - show st.spinner("✨ Generating AI summary...")
+    - call generate_summary(st.session_state.df)
+    - store the result in st.session_state.summary
+- If st.session_state.summary is not empty, display it using st.info()
+
+Export CSV behavior:
+- If processed data exists:
+  - convert st.session_state.df to CSV without index
+  - expose it through st.download_button
+  - file name should be expenses.csv
+  - mime type should be text/csv
+
+Error handling:
+- Do not crash if date parsing fails
+- Do not crash if some expected columns are missing
+- If needed, safely create missing columns with empty strings before display
+- All return statements must be explicit
+- The final code must be runnable as a Streamlit app
+
+Return only the complete Python file and nothing else.
+
 ```
 
 
