@@ -497,10 +497,13 @@ If `streamlit` is not on your PATH:
 ```bash
 python3 -m streamlit run app.py
 ```
+For example:
+```bash
+cd /Users/austinzhang/Desktop/Test\ Bob && streamlit run app.py
+```
 
 The app opens automatically at **http://localhost:8501**.
 
----
 
 ## Usage
 
@@ -512,36 +515,6 @@ The app opens automatically at **http://localhost:8501**.
 6. **Export**: Click "⬇️ Export CSV" to download the extracted data
 
 ---
-
-
-
-## Advanced Configuration
-
-### Change LLM Model
-
-Edit `.env` and change `LLM_NAME`:
-
-```env
-LLM_NAME=ibm/granite-3-8b-instruct      # Default
-# LLM_NAME=ibm/granite-13b-instruct-v2
-# LLM_NAME=meta-llama/llama-3-70b-instruct
-```
-
-### Change Region
-
-Edit `.env` and update `CLOUD_URL`:
-
-```env
-CLOUD_URL=https://us-south.ml.cloud.ibm.com   # US South (default)
-CLOUD_URL=https://ca-tor.ml.cloud.ibm.com      # Canada (Toronto)
-CLOUD_URL=https://eu-de.ml.cloud.ibm.com       # Europe (Frankfurt)
-```
-
-### Change Port
-
-```bash
-streamlit run app.py --server.port 8502
-```
 
 ---
 
