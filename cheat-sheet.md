@@ -1,572 +1,447 @@
-# 📋 Cheat Sheet — AI Travel Expense Tracker Bobathon
+# 🛠️ Cheat Sheet — AI Travel Expense Tracker
 
-> Keep this open the whole time. Everything you need is on this page.
-
----
-
-## 📌 Table of Contents
-
-1. [What You're Building](#1-what-youre-building)
-2. [Before You Start — Checklist](#2-before-you-start--checklist)
-3. [Get Your IBM Credentials, API Keys](#3-get-your-ibm-credentials)
-4. [Set Up Your Project Folder](#4-set-up-your-project-folder)
-5. [Bob Prompts — Generate Each File](#5-bob-prompts--generate-each-file)
-6. [Install & Run](#6-install--run)
-7. [Test the App](#7-test-the-app)
-8. [Troubleshooting](#8-troubleshooting)
-9. [Python 3.14 Special Setup](#9-python-314-special-setup)
-10. [File Naming Tips](#10-file-naming-tips)
+Quick reference for credentials, commands, Bob prompts, and fixes.
+If something breaks, start here before anything else.
 
 ---
 
-## 1. What You're Building
+## 📋 Table of Contents
 
-A Streamlit web app that:
-
-| Feature | Details |
-|---------|---------|
-| 📄 Upload receipts | Up to 10 PDF files at once |
-| 🤖 AI extraction | IBM watsonx.ai reads each receipt and pulls out expense data |
-| 📊 Charts | 3 interactive charts: by vendor, by category, by document type |
-| 💾 Export | Download all extracted data as a CSV file |
-
-**You are NOT building**: a database, a login system, or a chat interface. Just the core tracker.
-
-**Files you'll create** (Bob generates all of these):
-
-```
-ai-travel-expense-tracker/
-├── requirements.txt     ← Python packages to install
-├── .env                 ← Your IBM credentials (never share this)
-├── model_gateway.py     ← Connects to IBM watsonx.ai
-├── doc_processing.py    ← Reads PDFs and extracts expense data
-└── app.py               ← The web interface
-```
+1. [Credentials Setup](#1-credentials-setup)
+2. [Terminal Commands](#2-terminal-commands)
+3. [Validation Checks](#3-validation-checks)
+4. [Bob Prompt Fixes](#4-bob-prompt-fixes)
+5. [Troubleshooting — Error by Error](#5-troubleshooting--error-by-error)
+6. [File Naming Rules](#6-file-naming-rules)
+7. [Python 3.14 Special Setup](#7-python-314-special-setup)
 
 ---
 
-## 2. Before You Start — Checklist
+## 1. Credentials Setup
 
-Go through this before the lab begins:
-
-- [ ] **Bob is installed** and you can open it
-- [ ] **Python 3.10–3.13** is installed → run `python3 --version` in your terminal to check
-- [ ] **You have an IBM Cloud account** → [sign up free at cloud.ibm.com](https://cloud.ibm.com)
-- [ ] **You have a watsonx.ai project** created in IBM Cloud
-- [ ] **5 GB+ free disk space** → Docling downloads ~2 GB of AI models on first run
-- [ ] **Stable internet** → needed for model downloads and API calls
-
-> ⚠️ **Using Python 3.14?** Stop here and read [Section 9](#9-python-314-special-setup) first.
-
----
-
-## 3. Get Your IBM Credentials
-
-You need **two things** from IBM Cloud before writing any code. Get these first.
-
----
-
-### 3a. Get Your API Key
-
-Your API Key is like a password that lets your app talk to IBM watsonx.ai.
-
-**Step by step:**
-
-1. Go to [cloud.ibm.com](https://cloud.ibm.com) and sign in
-2. Click your **profile avatar** in the top-right corner
-3. Click **Manage** → **Access (IAM)**
-4. In the left sidebar, click **API keys**
-5. Click the blue **Create** button
-6. Give it a name — anything works, e.g. `bobathon-key`
-7. Click **Create**
-8. ⚠️ **Copy the key immediately** — IBM only shows it once. If you miss it, you'll need to create a new one.
-9. Paste it somewhere safe (you'll need it in a moment)
-
-> 💡 The key looks like this: `abc123XYZdef456...` — a long string of random characters
-
----
-
-### 3b. Get Your Project ID
-
-Your Project ID tells watsonx.ai which project to bill usage to.
-
-**Step by step:**
-
-1. From the IBM Cloud dashboard, click **Resource List** in the left sidebar
-2. Look under **AI / Machine Learning** — find your **watsonx.ai** instance and click it
-3. Click **Launch IBM watsonx** (blue button)
-4. On the watsonx home screen, scroll down to find **Developer Access**
-5. Click the project dropdown and select your project
-6. Copy the **Project ID** — it looks like this: `12345678-1234-1234-1234-123456789abc` (36 characters with dashes)
-
-> 💡 Can't find Developer Access? Try: top-right menu → **Manage** → your project → **Manage** tab → copy the ID from there.
-
----
-
-### 3c. Find Your Region URL
-
-Your `CLOUD_URL` depends on where your IBM Cloud account is based.
-Check the region name in the **top-right corner** of the IBM Cloud dashboard.
-
-| Your Region | Use this URL |
-|-------------|-------------|
-| US South (Dallas) | `https://us-south.ml.cloud.ibm.com` |
-| Canada (Toronto) | `https://ca-tor.ml.cloud.ibm.com` |
-| Europe (Frankfurt) | `https://eu-de.ml.cloud.ibm.com` |
-| UK (London) | `https://eu-gb.ml.cloud.ibm.com` |
-| Asia Pacific (Tokyo) | `https://jp-tok.ml.cloud.ibm.com` |
-
----
-
-## 4. Set Up Your Project Folder
-
-### Create the folder
-
-```bash
-mkdir ai-travel-expense-tracker
-cd ai-travel-expense-tracker
-```
-
-### Create your `.env` file
-
-This file stores your credentials. Create a file called `.env` (just `.env`, no other extension) and paste this in:
+### What goes in your `.env` file
 
 ```env
-API_KEY=paste_your_api_key_here
-PROJECT_ID=paste_your_project_id_here
+API_KEY=your_ibm_cloud_api_key_here
+PROJECT_ID=your_watsonx_project_id_here
 CLOUD_URL=https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
 ```
 
-Replace the two placeholder values with your real credentials from Section 3.
-Update `CLOUD_URL` if you're not in US South.
+### CLOUD_URL by Region
 
-**How to create `.env` on Mac/Linux:**
+| Region | URL |
+|--------|-----|
+| US South (Dallas) | `https://us-south.ml.cloud.ibm.com` |
+| Canada (Toronto) | `https://ca-tor.ml.cloud.ibm.com` |
+| Europe (Frankfurt) | `https://eu-de.ml.cloud.ibm.com` |
+| UK (London) | `https://eu-gb.ml.cloud.ibm.com` |
+
+> ⚠️ **Wrong region = 403 Forbidden error.** Check your region in IBM Cloud — top right corner next to your account name. If you're on a TechZone reservation, check the reservation details page.
+
+### How to get your API Key
+
+1. Go to [cloud.ibm.com](https://cloud.ibm.com) and sign in
+2. Click your avatar (top right) → **Manage** → **Access (IAM)**
+3. Left sidebar → **API keys** → **Create**
+4. Give it any name (e.g. `bobathon-key`) → **Create**
+5. ⚠️ Copy it **immediately** — it is shown only once. If you miss it, delete it and create a new one.
+
+### How to get your Project ID
+
+1. IBM Cloud → **Resource List** → under **AI / Machine Learning** → click your **watsonx.ai Runtime** instance
+2. Click **Launch IBM watsonx**
+3. On the home screen, find **Developer Access**
+4. Select your project from the dropdown
+5. Copy the **Project ID** — it is a 36-character UUID: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+> ⚠️ **Truncated Project ID = 400 Bad Request.** Always verify the full 36 characters including hyphens.
+
+### How to open your `.env` file to edit it
+
+`.env` is a hidden file. You cannot double-click it — use one of these:
+
 ```bash
-touch .env
-open -e .env    # opens in TextEdit
-```
+# Mac — opens in TextEdit
+open -e .env
 
-**How to create `.env` on Windows:**
-```powershell
-New-Item .env
+# Mac — opens in nano (terminal editor)
+nano .env
+
+# Windows
 notepad .env
 ```
 
-> 🔒 **Never share or upload your `.env` file.** It contains your API key.
-> Add `.env` to your `.gitignore` if using Git.
+### How to update credentials when your IBM environment expires
 
----
+Only the `.env` file needs to change — no code changes required.
 
-### Create `requirements.txt`
+```bash
+# Open the file
+open -e .env   # Mac
+notepad .env   # Windows
 
-Create a file called `requirements.txt` with exactly this content:
-
-```
-streamlit
-pandas
-plotly
-docling
-python-dotenv
-requests
-```
-
-You can ask Bob to create this, or just create it manually — it's only 6 lines.
-
----
-
-## 5. Bob Prompts — Generate Each File
-
-Use these prompts in Bob **in order**. Copy the whole prompt, paste it into Bob, wait for Bob to finish, then save the file before moving on.
-
-> 💡 **Tip**: After Bob generates each file, quickly skim it to make sure it looks complete (not cut off). If it seems truncated, use the follow-up prompt at the bottom of this section.
-
----
-
-### Prompt 1 — Generate `model_gateway.py`
-
-This file handles the connection to IBM watsonx.ai.
-
-```
-Generate a Python file called model_gateway.py that connects to IBM watsonx.ai using the REST API (not the SDK).
-
-Requirements:
-- Load API_KEY, PROJECT_ID, CLOUD_URL, and LLM_NAME from a .env file using python-dotenv
-- Implement IAM token exchange: POST to https://iam.cloud.ibm.com/identity/token to get a Bearer token
-- Cache the token for 50 minutes (IBM tokens expire after 60 minutes)
-- Expose a single public function: invoke_llm(prompt: str) -> str
-- Call the watsonx.ai text generation endpoint: {CLOUD_URL}/ml/v1/text/generation?version=2023-05-29
-- Use these generation parameters:
-    max_new_tokens: 2048
-    temperature: 0.0
-    repetition_penalty: 1.05
-    stop_sequences: ["```"]
-
-Return only the complete Python file with no explanations.
-```
-
-**Why REST API and not the SDK?**
-The IBM watsonx-ai Python SDK has compatibility issues with Python 3.14. Using the REST API directly works on all Python versions and is more reliable in workshop environments.
-
----
-
-### Prompt 2 — Generate `doc_processing.py`
-
-This file reads PDFs and uses the LLM to extract expense data.
-
-```
-Generate a Python file called doc_processing.py for processing travel expense PDF receipts.
-
-Requirements:
-
-PDF parsing:
-- Use Docling to convert PDF bytes to Markdown text
-- Configure Docling with: do_ocr=False, do_table_structure=True
-- Save PDF bytes to a temp file, convert, then delete the temp file
-
-Document type detection (from filename, case-insensitive):
-- hotel: keywords hotel, inn, marriott, hilton, hyatt, sheraton, westin, fairmont, resort, lodge, accommodation → doc_type = "hotel"
-- flight: keywords flight, airline, boarding, airways → doc_type = "flight"
-- meal: keywords meal, restaurant, food, dining, cafe, bistro → doc_type = "meal"
-- car: keywords car, rental, vehicle, hertz, avis, enterprise → doc_type = "car"
-- Default fallback (no keyword match): "hotel"
-- Hotel keywords take highest priority
-
-LLM extraction:
-- Write a separate extraction prompt for each of the 4 document types
-- Each prompt asks the LLM to return ONLY a JSON array (no markdown, no explanation)
-- Each extracted row must have these fields:
-    date (YYYY-MM-DD), vendor, doc_type, category, description, currency, amount, confidence (0.0–1.0)
-- Categories for hotel: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Miscellaneous
-- Categories for flight: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Miscellaneous
-- Categories for meal: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Miscellaneous
-- Categories for car: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Miscellaneous
-
-Amount parsing:
-- Handle currency symbols: $, €, £, ¥, ₹
-- Handle thousands separators: 1,234.56
-- Handle European decimal format: 1.234,56
-- Always apply abs() to the final amount (expenses are always positive)
-
-JSON parsing:
-- Use regex to find the [...] array in LLM output (LLM may include extra text)
-- Return an empty list if no valid JSON is found
-
-Output:
-- Function process_invoices(uploaded_files) → pandas DataFrame
-- Columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount, Confidence
-- Function analyze_invoices(df) → tuple of 3 Plotly figures:
-    1. Horizontal bar chart: expenses by vendor (color #3B82F6)
-    2. Donut chart: expenses by category (hole=0.4)
-    3. Bar chart: expenses by document type (Hotel=#3B82F6, Flight=#A855F7, Meal=#10B981, Car Rental=#F59E0B)
-- All charts: transparent background, Inter font, color #1E293B
-
-Return only the complete Python file with no explanations.
+# Replace API_KEY and PROJECT_ID with your new values
+# Save and restart the app
+streamlit run app.py
 ```
 
 ---
 
-### Prompt 3 — Generate `app.py`
+## 2. Terminal Commands
 
-This file is the Streamlit web interface.
+### Navigate to your project folder
 
-```
-Generate a Python file called app.py for a Streamlit web application called "AI Travel Expense Tracker".
+```bash
+# Mac / Linux
+cd ~/Desktop/ai-travel-expense-tracker
 
-Requirements:
-
-Imports:
-- from doc_processing import process_invoices, analyze_invoices
-- from model_gateway import invoke_llm
-
-Page setup:
-- st.set_page_config: title="AI Travel Expense Tracker", page_icon="✈️", layout="wide"
-- Custom CSS: Inter font, background #F1F5F9, white cards with border-radius, hide Streamlit footer
-
-Layout:
-- Hero banner: dark gradient background (#0F172A to #1D4ED8), show app title and subtitle
-- Badge in hero: "Powered by IBM watsonx.ai"
-- File uploader: accepts PDF only, up to 10 files, label "Upload your receipts (PDF format)"
-- Three buttons in a row: Submit (primary), Analyze (secondary), Export CSV (download button)
-
-Session state:
-- st.session_state.df → stores the extracted DataFrame
-- st.session_state.chat_history → stores chat messages
-
-On Submit button click:
-- Call process_invoices(uploaded_files) and store result in st.session_state.df
-- Show a success message
-
-Results section (shown when st.session_state.df is not empty):
-- 4 metric cards: Files Processed, Line Items, Total Amount (formatted as $X,XXX.XX), Avg Confidence (as %)
-- Styled dataframe with emoji column headers:
-  📅 Date, 🏢 Vendor, 📄 Doc Type, 🏷️ Category, 📝 Description, 💱 Currency, 💵 Amount, 🎯 Confidence
-
-On Analyze button click:
-- Call analyze_invoices(st.session_state.df)
-- Show all 3 charts using st.plotly_chart
-
-Export CSV button:
-- Only show when st.session_state.df is not empty
-- Download filename: "expenses.csv"
-
-Do NOT include: Astra DB, database connections, or any external storage.
-
-Return only the complete Python file with no explanations.
+# If your folder has a space in the name
+cd ~/Desktop/Test\ Bob
+# or
+cd "/Users/yourname/Desktop/Test Bob"
 ```
 
----
+> ⚠️ **Always run this first** every time you open a new Terminal window. If you skip it, you'll get "module not found" errors.
 
-### If Bob's output looks incomplete
+### Install dependencies
 
-If Bob stops generating mid-file or the code looks cut off:
+```bash
+# Standard (Python 3.10–3.13)
+pip install -r requirements.txt
 
-```
-The file you generated appears to be incomplete or truncated. Please regenerate 
-the complete [file name] from the beginning. Include every function in full. 
-Do not summarize or skip any section. Return only the complete Python file.
-```
+# If pip3 is needed
+pip3 install -r requirements.txt
 
-### If you want Bob to explain something
-
-```
-Explain what this code does in simple terms, as if I'm new to Python:
-
-[paste the code here]
+# If you get permission errors
+pip install -r requirements.txt --user
 ```
 
-### If Bob generates an error in the code
+### Run the app
+
+```bash
+streamlit run app.py
+
+# If 'streamlit' command not found
+python3 -m streamlit run app.py
+
+# If port 8501 is already in use
+streamlit run app.py --server.port 8502
+```
+
+### Fix smart quote errors (one-time fix)
+
+```bash
+# If you get SyntaxError: invalid character '"' (U+201C)
+python3 -c "
+f = open('doc_processing.py', 'r', encoding='utf-8')
+content = f.read()
+f.close()
+content = content.replace('\u201c', '\"').replace('\u201d', '\"').replace('\u2018', \"'\").replace('\u2019', \"'\")
+f = open('doc_processing.py', 'w', encoding='utf-8')
+f.write(content)
+f.close()
+print('Done!')
+"
+```
+
+Run the same command for `app.py` or `model_gateway.py` if needed — just replace the filename.
+
+### Show hidden files in Finder (Mac)
 
 ```
-This code produces the following error when I run it:
-
-[paste the error message here]
-
-Please fix the issue and return the corrected complete file.
+Cmd + Shift + .
 ```
 
 ---
 
-## 6. Install & Run
+## 3. Validation Checks
 
-### Step 1 — Validate before installing
-```
-> 🔴 **Every time you open a new Terminal window**, run this first:
-> ```bash
-> cd "/path/to/your/project-folder"
-> ```
-> Example: `cd "/Users/yourname/Desktop/Test Bob"`
-> Skipping this is the #1 cause of "module not found" and "file not found" errors.
-```
-Run these checks first. They catch the most common problems before you waste time installing.
+Run these **before** starting the app to catch problems early.
 
-**Check Python version:**
+### Check Python version
+
 ```bash
 python3 --version
-# ✅ Good: Python 3.10.x, 3.11.x, 3.12.x, or 3.13.x
-# ⚠️  If 3.14.x: go to Section 9 before continuing
+# Expected: Python 3.10.x, 3.11.x, 3.12.x, or 3.13.x
+# Python 3.14 works but needs special setup — see Section 7
 ```
 
-**Test your API Key (Mac/Linux):**
+### Check all packages are installed
+
+```bash
+python3 -c "import streamlit, pandas, plotly, docling, requests, dotenv; print('✅ All OK')"
+# Expected: ✅ All OK
+# If ModuleNotFoundError: run pip install -r requirements.txt again
+```
+
+### Test your API Key (Mac / Linux)
+
 ```bash
 curl -s -o /dev/null -w "%{http_code}" \
   -X POST "https://iam.cloud.ibm.com/identity/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
-# ✅ Good: 200
-# ❌ Bad: 400 or 401 → your API key is wrong, go back to Section 3a
 ```
 
-**Test your API Key (Windows PowerShell):**
+Replace `YOUR_API_KEY` with your actual key.
+
+| Output | Meaning |
+|--------|---------|
+| `200` | ✅ Key is valid |
+| `400` | ❌ Malformed request — check for typos in the key |
+| `401` | ❌ Key is invalid or deleted — generate a new one |
+
+### Test your API Key (Windows PowerShell)
+
 ```powershell
 $body = "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
 Invoke-RestMethod -Method Post `
   -Uri "https://iam.cloud.ibm.com/identity/token" `
   -ContentType "application/x-www-form-urlencoded" `
   -Body $body | Select-Object token_type
-# ✅ Good: shows token_type = Bearer
+# Expected: token_type = Bearer
 ```
 
-Replace `YOUR_API_KEY` with your actual key from `.env`.
+### Test the full watsonx.ai connection
+
+```bash
+# Run from inside your project folder
+python3 -c "
+from model_gateway import invoke_llm
+print(invoke_llm('Say hello in one sentence.'))
+"
+# Expected: Granite 3 replies with a sentence
+```
+
+### Check your `.env` file is correct
+
+```bash
+cat .env        # Mac / Linux
+Get-Content .env  # Windows PowerShell
+```
+
+You should see your actual credentials, not placeholder text.
 
 ---
 
-### Step 2 — Install dependencies
+## 4. Bob Prompt Fixes
 
-**Python 3.10–3.13:**
-```bash
-pip install -r requirements.txt
+Paste these into Bob when something goes wrong with generated code.
+
+### Fix: Missing return statement (Generate Summary button does nothing)
+
+```
+The generate_summary() function in app.py is not returning a value.
+Find the invoke_llm() call inside generate_summary(), store the result
+in a variable called summary, and add an explicit return statement:
+    return summary
+Return the complete fixed app.py.
 ```
 
-**Python 3.14:** → See [Section 9](#9-python-314-special-setup)
+### Fix: Smart / curly quotes causing SyntaxError
 
-> ⏳ This may take a few minutes. Docling has many dependencies.
+```
+This file contains curly/smart quotes (" " ' ') instead of straight
+ASCII quotes (" "). Python does not accept curly quotes as string
+delimiters and throws a SyntaxError.
 
-**Verify everything installed correctly:**
-```bash
-python3 -c "import streamlit, pandas, plotly, docling, requests; print('✅ All imports OK')"
-# ✅ Good: All imports OK
-# ❌ Bad: ModuleNotFoundError → run pip install again
+Replace all curly quotes with straight ASCII quotes throughout the
+entire file. Use only straight " and ' characters everywhere.
+Return the complete fixed file.
+```
+
+### Fix: Docling API error (do_ocr / do_table_structure arguments rejected)
+
+```
+The _pdf_to_markdown function is calling converter.convert() with
+do_ocr and do_table_structure as direct arguments. These are no longer
+accepted. Fix it to use PdfPipelineOptions instead:
+
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
+
+pipeline_options = PdfPipelineOptions()
+pipeline_options.do_ocr = False
+pipeline_options.do_table_structure = True
+
+converter = DocumentConverter(
+    format_options={
+        InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+    }
+)
+result = converter.convert(tmp_path)
+
+Return the complete fixed doc_processing.py.
+```
+
+### Fix: AI Summary returns Markdown symbols (**, ##, *, -)
+
+```
+The generate_summary() function in app.py sometimes receives a response
+from the LLM that contains Markdown formatting like **, ##, *, -.
+These appear as raw symbols in the Streamlit UI.
+
+Make two changes:
+1. In the prompt sent to invoke_llm(), add this instruction:
+   "Do not use any markdown formatting, bullet points, headers, or
+   bold text. Return plain text only."
+2. After receiving the response, strip any remaining markdown symbols
+   before returning: remove **, ##, *, and leading - characters.
+
+Return the complete fixed app.py.
+```
+
+### Fix: Amount shows $0.00
+
+```
+The expense amounts in the extracted DataFrame are showing as $0.00.
+This is caused by negative amounts in the LLM output.
+
+In the _normalize_row() function in doc_processing.py, make sure
+abs() is applied to the final amount value before it is added to the
+row. Return the complete fixed doc_processing.py.
+```
+
+### Fix: Pie chart / donut chart error
+
+```
+The analyze_invoices() function is applying xaxis and yaxis layout
+settings to a pie/donut chart, which causes an error. Pie charts
+do not support xaxis/yaxis.
+
+Separate the layout configuration: use one layout dict for bar charts
+and a different layout dict for the pie/donut chart. Do not apply
+xaxis or yaxis to any pie or donut chart.
+Return the complete fixed doc_processing.py.
+```
+
+### Fix: Bob's output looks cut off / incomplete
+
+```
+The file you generated appears to be incomplete. Please regenerate the
+full [model_gateway.py / doc_processing.py / app.py] with all functions
+fully implemented. Do not truncate, summarize, or skip any section.
+Return only the complete file.
+```
+
+### Add to every Bob prompt (preventive)
+
+Add this line at the end of any prompt to prevent common issues:
+
+```
+Use only straight ASCII quotes (" and ') in all code. Do not use curly
+or smart quotes. Include all return statements explicitly.
 ```
 
 ---
 
-### Step 3 — Launch the app
+## 5. Troubleshooting — Error by Error
 
-```bash
-streamlit run app.py
-```
+### App errors
 
-If that doesn't work:
-```bash
-python3 -m streamlit run app.py
-```
-
-The app opens automatically at **http://localhost:8501**
-
-> ⚠️ **First run warning**: Docling will download ~2 GB of AI models. This takes **5–10 minutes** depending on your internet speed. You'll see download progress in the terminal. **Do not close the terminal or interrupt the process** — if you do, you'll have to start the download again.
->
-> Second run onwards is instant — the models are cached locally.
-
----
-
-## 7. Test the App
-
-Once the app is running:
-
-1. **Upload a receipt** → click the file uploader, select a PDF from `sample-receipts/`
-2. **Click Submit** → wait 10–30 seconds per file while the AI reads it
-3. **Check the table** → you should see extracted rows with dates, vendors, amounts
-4. **Click Analyze** → three charts appear
-5. **Click Export CSV** → downloads a `.csv` file with all extracted data
-
-**If the results look wrong:**
-- Check that the PDF filename contains the right keyword (see Section 10)
-- Try a different sample receipt
-- Make sure you clicked Submit before Analyze
-
----
-
-## 8. Troubleshooting
-
-### Common errors and how to fix them
-
-| Error / Symptom | What it means | How to fix |
-|-----------------|---------------|------------|
-| `ModuleNotFoundError: No module named 'docling'` | Dependencies not installed | Run `pip install -r requirements.txt` |
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `ModuleNotFoundError: No module named 'docling'` | Dependencies not installed | `pip install -r requirements.txt` |
+| `ModuleNotFoundError: No module named 'dotenv'` | python-dotenv not installed | `pip install python-dotenv` |
 | `streamlit: command not found` | Streamlit not on PATH | Use `python3 -m streamlit run app.py` |
-| `401 Unauthorized` | API key not converting to token | Check that `model_gateway.py` uses IAM token exchange — look for a POST to `iam.cloud.ibm.com/identity/token`. It should NOT use the raw API key directly. |
-| `400 Bad Request` on token call | API key is wrong or expired | Double-check `API_KEY` in `.env` — no spaces, no quotes around the value |
-| `JSONDecodeError` | LLM returned markdown instead of JSON | Check that `stop_sequences: ["` ``` `"]` is in `model_gateway.py` |
-| Total Amount shows `$0.00` | Amounts are negative | Find `_normalize_row` in `doc_processing.py` — make sure `abs()` is applied to the amount |
-| Wrong document type detected | Filename doesn't match keywords | Rename the PDF to include the right keyword — see Section 10 |
-| Charts don't appear | Analyzed before submitting | Always click **Submit** first, then **Analyze** |
-| Pie/donut chart error | Wrong Plotly layout applied | Bar and pie charts need separate layout configs — don't apply `xaxis`/`yaxis` to a pie chart |
-| `TypeError: object.__init__()` | Python 3.14 + wrong install order | See Section 9 |
-| Port 8501 already in use | Another app is on that port | Run `streamlit run app.py --server.port 8502` |
-| First run takes forever | Docling downloading models | This is normal — wait 5–10 min, don't interrupt |
-| `.env` file not found | File hidden or wrong name | Make sure the file is called `.env` (not `env.txt` or `.env.txt`) |
-| `PROJECT_ID` not working | Wrong value copied | Should be 36 characters with dashes: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
-| `AttributeError: object has no attribute 'getvalue'` | Bob generated code using getvalue() instead of read() | Ask Bob to fix: "In doc_processing.py, replace all instances of getvalue() with read() in the process_invoices function" |
-| `ValidationError: Unexpected keyword argument do_ocr` | Bob passed Docling options to the wrong place | Ask Bob to fix using PdfPipelineOptions — paste this prompt: "Fix _pdf_to_markdown in doc_processing.py to use PdfPipelineOptions instead of passing do_ocr and do_table_structure to converter.convert()" |
+| `SyntaxError: invalid character '"' (U+201C)` | Bob generated curly quotes | Run the smart quote fix command in Section 2 |
+| `SyntaxError: invalid syntax` | Bob generated broken code | Paste the file back into Bob: *"Fix all syntax errors. Return the complete file."* |
+| `NameError: name 'X' is not defined` | Missing import or undefined function | Paste the error + full file into Bob: *"Fix this error. Return the complete file."* |
+| Port 8501 already in use | Another app is running | `streamlit run app.py --server.port 8502` |
+
+### API / credential errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `401 Unauthorized` | API Key invalid or not exchanged for token | Check `model_gateway.py` uses IAM token exchange (POST to `iam.cloud.ibm.com/identity/token`). Regenerate API Key if needed. |
+| `403 Forbidden` | Wrong region URL | Check `CLOUD_URL` in `.env` matches your IBM Cloud region. See region table in Section 1. |
+| `403 Forbidden` (even after fixing region) | API Key does not have access to this project | Go to IBM Cloud → IAM → check the API Key has access to your watsonx.ai project |
+| `400 Bad Request` on token call | API Key malformed or truncated | Check `.env` — no spaces, no quotes around the value, full key copied |
+| `400 Bad Request` on watsonx call | Project ID is wrong or truncated | Verify `PROJECT_ID` in `.env` is exactly 36 characters: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
+| `JSONDecodeError` | LLM returned markdown fences instead of JSON | Check `stop_sequences: ["` ``` `"]` is in `model_gateway.py` |
+
+### Data / output issues
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Total Amount shows `$0.00` | LLM returned negative amounts, `abs()` missing | See Bob fix prompt in Section 4 |
+| Wrong document type detected | PDF filename doesn't match keywords | Rename file — see Section 6 |
+| Generate Summary button does nothing | `return` statement missing in `generate_summary()` | See Bob fix prompt in Section 4 |
+| Summary shows `**bold**` or `### headers` | LLM returned Markdown | See Bob fix prompt in Section 4 |
+| Charts don't appear | Clicked Analyze before Submit | Always click **Submit** first, then **Analyze** |
+| Pie chart crashes the app | Wrong Plotly layout applied | See Bob fix prompt in Section 4 |
+| App shows blank page / no content | Streamlit state issue | Refresh the browser tab |
+| First run takes 5–10 minutes | Docling downloading ~2GB of ML models | Normal — wait, do not interrupt. Subsequent runs are instant. |
+| `.env` file not found | File has wrong name or wrong extension | Make sure it is exactly `.env` — not `env.txt`, `.env.txt`, or `env` |
+
+### Installation issues
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `TypeError: object.__init__() takes exactly one argument` | Python 3.14 + IBM SDK | Use REST API in `model_gateway.py`, not the SDK. See Section 7. |
+| `ERROR: Failed to build pillow` | Python 3.14 binary incompatibility | See Section 7 — install pillow with `--only-binary :all:` first |
+| `pip takes forever / resolution too deep` | Dependency conflict | Use `uv` instead: `pip install uv && uv pip install -r requirements.txt` |
+| `pip install` fails with permissions error | System Python | Add `--user` flag: `pip install -r requirements.txt --user` |
 
 ---
 
-### How to check your `.env` file is correct
+## 6. File Naming Rules
 
-```bash
-# Mac/Linux — print the file contents
-cat .env
+The app detects document type from the **PDF filename**. If the filename doesn't contain the right keyword, the wrong extraction prompt is used and results will be inaccurate.
 
-# Windows PowerShell
-Get-Content .env
+| Document Type | Keywords that trigger it |
+|---------------|--------------------------|
+| Hotel | `hotel`, `inn`, `marriott`, `hilton`, `hyatt`, `sheraton`, `westin`, `fairmont`, `resort`, `lodge`, `accommodation` |
+| Flight | `flight`, `airline`, `boarding`, `airways` |
+| Meal | `meal`, `restaurant`, `food`, `dining`, `cafe`, `bistro` |
+| Car Rental | `car`, `rental`, `vehicle`, `hertz`, `avis`, `enterprise` |
+| Generic | anything that doesn't match the above |
+
+**Good examples:**
+```
+marriott_hotel_nov2024.pdf     ✅ detected as Hotel
+delta_flight_receipt.pdf       ✅ detected as Flight
+uber_eats_meal.pdf             ✅ detected as Meal
+hertz_car_rental.pdf           ✅ detected as Car Rental
 ```
 
-You should see your actual API key and Project ID, not the placeholder text. Make sure there are no quotes around the values:
-
-```env
-# ✅ Correct
-API_KEY=abc123yourrealkeyhere
-
-# ❌ Wrong — don't put quotes
-API_KEY="abc123yourrealkeyhere"
+**Bad examples:**
 ```
-
----
-
-### How to find a hidden `.env` file
-
-`.env` files are hidden by default on most systems.
-
-**Mac — show hidden files in Finder:**
-Press `Cmd + Shift + .`
-
-**Mac — open in text editor from terminal:**
-```bash
-open -e .env
-```
-
-**Windows — show hidden files in File Explorer:**
-Go to **View** → check **Hidden items**
-
-**Windows — open in Notepad:**
-```powershell
-notepad .env
+receipt_001.pdf                ⚠️ detected as Generic
+invoice.pdf                    ⚠️ detected as Generic
+scan_20241103.pdf              ⚠️ detected as Generic
 ```
 
 ---
 
-## 9. Python 3.14 Special Setup
+## 7. Python 3.14 Special Setup
 
-If `python3 --version` shows `3.14.x`, **do not run `pip install -r requirements.txt` directly** — it will fail.
-
-Use this exact sequence instead:
+Python 3.14 has binary compatibility issues with some packages. Use this install sequence instead of the standard one.
 
 ```bash
-# Step 1: Install uv (a faster, more compatible package manager)
+# Step 1 — Install uv package manager
 pip install uv
 
-# Step 2: Install pillow FIRST with binary-only flag
+# Step 2 — Install pillow with binary-only flag FIRST, before anything else
 uv pip install pillow==11.3.0 --only-binary :all:
 
-# Step 3: Install everything else
+# Step 3 — Install everything else
 uv pip install -r requirements.txt
 ```
 
-**Why does this happen?** Python 3.14 introduced binary compatibility changes that break how `pip` compiles certain packages (especially `pillow` and its dependencies). Installing `pillow` first with `--only-binary :all:` forces it to use a pre-compiled version, which unblocks the rest of the installation.
+> ⚠️ Do NOT run `pip install -r requirements.txt` normally on Python 3.14 — it will fail with a pillow build error. Always follow the three steps above in order.
+
+Also make sure your `model_gateway.py` uses the **REST API**, not the IBM SDK. The SDK (`ibm-watsonx-ai`) is incompatible with Python 3.14. If Bob generated an SDK-based version, paste this into Bob:
+
+```
+Rewrite model_gateway.py to connect to IBM watsonx.ai using the REST API only.
+Do not import or use ibm-watsonx-ai or any IBM SDK packages.
+Use only: requests, python-dotenv, and standard library modules.
+Return the complete rewritten file.
+```
 
 ---
 
-## 10. File Naming Tips
-
-The app detects what kind of receipt a PDF is based on **keywords in the filename**.
-If the filename has no recognizable keyword, it defaults to **Hotel**.
-
-Name your PDF files to include one of these keywords:
-
-| Receipt Type | Keywords to include in filename | Example filename |
-|---|---|---|
-| 🏨 Hotel | `hotel`, `inn`, `marriott`, `hilton`, `hyatt`, `sheraton`, `westin`, `fairmont`, `resort`, `lodge`, `accommodation` | `marriott_hotel_toronto.pdf` |
-| ✈️ Flight | `flight`, `airline`, `boarding`, `airways` | `delta_flight_nyc.pdf` |
-| 🍽️ Meal | `meal`, `restaurant`, `food`, `dining`, `cafe`, `bistro` | `lunch_restaurant_chicago.pdf` |
-| 🚗 Car Rental | `car`, `rental`, `vehicle`, `hertz`, `avis`, `enterprise` | `hertz_car_rental.pdf` |
-
-> 💡 **Tip**: Rename the sample PDFs in `sample-receipts/` before uploading if you want to test different document types.
-
----
-
-## Quick Reference Card
-
-| Task | Command |
-|------|---------|
-| Check Python version | `python3 --version` |
-| Install dependencies | `pip install -r requirements.txt` |
-| Check imports | `python3 -c "import streamlit, pandas, plotly, docling, requests; print('OK')"` |
-| Run the app | `streamlit run app.py` |
-| Run if streamlit not found | `python3 -m streamlit run app.py` |
-| Run on different port | `streamlit run app.py --server.port 8502` |
-| App URL | http://localhost:8501 |
-
----
-
-*Stuck? Ask your facilitator — or check the `solution/` folder as a last resort.* 🚀
+*Built for IBM Bobathon · Powered by IBM Bob and watsonx.ai Granite 3*
