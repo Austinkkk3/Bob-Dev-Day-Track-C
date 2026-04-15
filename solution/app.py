@@ -6,22 +6,23 @@ from model_gateway import invoke_llm
 
 # Page configuration
 st.set_page_config(
-    page_title="AI Travel Expense Tracker",
-    page_icon="✈️",
+    page_title="IBM Travel Expense Tracker",
+    page_icon="💼",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Enhanced custom CSS styling
+# Enhanced custom CSS styling with IBM Carbon Design System
 custom_css = """
 <style>
 /* Hide Streamlit branding */
 footer {visibility: hidden;}
 #MainMenu {visibility: hidden;}
 
-/* Global font and background improvements */
+/* Global font and background improvements - IBM Plex Sans */
 .stApp {
-    background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
+    background: #f4f4f4;
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Hero banner animation */
@@ -37,42 +38,44 @@ footer {visibility: hidden;}
 }
 
 .hero-banner {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-    padding: 2.5rem;
-    border-radius: 15px;
+    background: linear-gradient(135deg, #0F62FE 0%, #0043CE 50%, #002D9C 100%);
+    padding: 3rem;
+    border-radius: 0;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     animation: fadeInDown 0.8s ease-out;
+    border-left: 4px solid #0F62FE;
 }
 
 .hero-banner h1 {
     color: white;
     margin: 0;
     font-size: 2.5rem;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    font-weight: 600;
+    letter-spacing: 0;
 }
 
 .hero-banner p {
-    color: #e0e7ff;
-    margin: 0.5rem 0 0 0;
-    font-size: 1.2rem;
-    font-weight: 300;
+    color: #ffffff;
+    margin: 0.75rem 0 0 0;
+    font-size: 1.125rem;
+    font-weight: 400;
+    opacity: 0.9;
 }
 
 /* File uploader styling */
 .stFileUploader {
     background: white;
     padding: 2rem;
-    border-radius: 12px;
-    border: 2px dashed #3b82f6;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    border-radius: 0;
+    border: 1px solid #0F62FE;
+    box-shadow: none;
+    transition: all 0.11s cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .stFileUploader:hover {
-    border-color: #1e3a8a;
-    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15);
+    border-color: #0043CE;
+    box-shadow: 0 0 0 1px #0F62FE, 0 0 0 3px rgba(15, 98, 254, 0.1);
 }
 
 /* Button styling */
@@ -93,39 +96,44 @@ footer {visibility: hidden;}
 div[data-testid="metric-container"] {
     background: white;
     padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border-left: 4px solid #3b82f6;
-    transition: all 0.3s ease;
+    border-radius: 0;
+    box-shadow: none;
+    border-left: 3px solid #0F62FE;
+    border-top: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    transition: all 0.11s cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 div[data-testid="metric-container"]:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* Dataframe styling */
 .stDataFrame {
-    border-radius: 12px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
 }
 
 /* Section headers */
 .section-header {
-    color: #1e3a8a;
-    font-size: 1.8rem;
-    font-weight: 700;
+    color: #161616;
+    font-size: 1.75rem;
+    font-weight: 600;
     margin: 2rem 0 1rem 0;
     padding-bottom: 0.5rem;
-    border-bottom: 3px solid #3b82f6;
+    border-bottom: 2px solid #0F62FE;
+    letter-spacing: 0;
 }
 
 /* Info box styling */
 .stAlert {
-    border-radius: 12px;
-    border-left: 4px solid #3b82f6;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 0;
+    border-left: 3px solid #0F62FE;
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
 }
 
 /* Success message */
@@ -157,24 +165,25 @@ div[data-testid="metric-container"]:hover {
 
 /* Spinner */
 .stSpinner > div {
-    border-color: #3b82f6 !important;
+    border-color: #0F62FE !important;
 }
 
 /* Chart containers */
 .js-plotly-plot {
-    border-radius: 12px;
+    border-radius: 0;
     background: white;
     padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
 }
 
 /* Summary box */
 .summary-box {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    background: #f4f4f4;
     padding: 2rem;
-    border-radius: 12px;
-    border-left: 4px solid #3b82f6;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 0;
+    border-left: 3px solid #0F62FE;
+    border: 1px solid #e0e0e0;
     margin-top: 1rem;
 }
 
@@ -215,6 +224,8 @@ if 'meal_budget' not in st.session_state:
     st.session_state.meal_budget = 800
 if 'car_budget' not in st.session_state:
     st.session_state.car_budget = 700
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
 
 # Sidebar - Budget Settings
 with st.sidebar:
@@ -269,6 +280,8 @@ def generate_summary(df: pd.DataFrame) -> str:
     # Compute statistics
     total_amount = df['Amount'].sum()
     num_items = len(df)
+    total_budget = st.session_state.total_budget
+    budget_remaining = total_budget - total_amount
     
     # Breakdown by category
     category_breakdown = df.groupby('Category')['Amount'].sum().to_dict()
@@ -293,36 +306,127 @@ def generate_summary(df: pd.DataFrame) -> str:
         date_info = ""
     
     # Build prompt
-    prompt = f"""Analyze these travel expense statistics and provide a 3-4 sentence plain English summary:
+    prompt = f"""You are writing a short travel expense summary for an end user.
 
-Total expenses: ${total_amount:.2f}
-Number of line items: {num_items}
-Category breakdown: {category_str}
-Top vendor: {top_vendor} (${top_vendor_amount:.2f})
-Document type breakdown: {doc_type_str}
-{date_info}
+Write exactly 3 short sentences in simple plain English.
+Focus only on:
+1. how much was spent,
+2. how much budget is left or whether the budget was exceeded,
+3. one or two simple suggestions.
 
-Provide a concise, professional summary highlighting key insights and spending patterns."""
+Return only the final summary text.
+Do not analyze the writing.
+Do not revise the response.
+Do not add extra explanation.
+Do not mention line items, top vendor, categories, or document types unless needed for a very short suggestion.
+Keep it clear and practical.
+
+Statistics:
+- Total expenses: ${total_amount:.2f}
+- Total budget: ${total_budget:.2f}
+- Budget remaining: ${budget_remaining:.2f}
+- Number of line items: {num_items}
+- Top vendor: {top_vendor} (${top_vendor_amount:.2f})
+- Document type breakdown: {doc_type_str}
+- {date_info if date_info else "Date information unavailable."}
+
+Example style:
+"You spent $1200.00 so far. You have $800.00 left in your budget. Try to reduce hotel and flight costs if you want to stay within budget."
+
+Write a concise summary in that style."""
     
     # Call LLM
-    summary = invoke_llm(prompt)
+    summary = invoke_llm(prompt).strip()
+    return summary
+
+def get_expense_context(df: pd.DataFrame) -> str:
+    """Generate context string about expenses for chat."""
+    total_amount = df['Amount'].sum()
+    num_items = len(df)
+    
+    # Breakdown by category
+    category_breakdown = df.groupby('Category')['Amount'].sum().to_dict()
+    category_str = "\n".join([f"  - {cat}: ${amt:.2f}" for cat, amt in category_breakdown.items()])
+    
+    # Breakdown by doc type
+    doc_type_breakdown = df.groupby('Doc Type')['Amount'].sum().to_dict()
+    doc_type_str = "\n".join([f"  - {doc}: ${amt:.2f}" for doc, amt in doc_type_breakdown.items()])
+    
+    # Breakdown by vendor
+    vendor_breakdown_map = df.groupby('Vendor')['Amount'].sum().to_dict()
+    top_vendors = sorted(vendor_breakdown_map.items(), key=lambda item: item[1], reverse=True)[:5]
+    vendor_str = "\n".join([f"  - {vendor}: ${amt:.2f}" for vendor, amt in top_vendors])
+    
+    # Date range
+    try:
+        df['Date_parsed'] = pd.to_datetime(df['Date'])
+        date_range = f"{df['Date_parsed'].min().strftime('%Y-%m-%d')} to {df['Date_parsed'].max().strftime('%Y-%m-%d')}"
+        num_days = (df['Date_parsed'].max() - df['Date_parsed'].min()).days + 1
+        avg_daily_spend = total_amount / num_days if num_days > 0 else 0
+        date_info = f"Date range: {date_range}\nAverage daily spend: ${avg_daily_spend:.2f}"
+    except:
+        date_info = "Date information not available"
+    
+    context = f"""Current Expense Data:
+Total expenses: ${total_amount:.2f}
+Number of line items: {num_items}
+
+Spending by Category:
+{category_str}
+
+Spending by Document Type:
+{doc_type_str}
+
+Top 5 Vendors:
+{vendor_str}
+
+{date_info}"""
+    
+    return context
+
+
+def chat_with_expenses(user_question: str, df: pd.DataFrame) -> str:
+    """Answer questions about expenses using LLM."""
+    context = get_expense_context(df)
+    
+    prompt = f"""You are a helpful AI assistant analyzing travel expenses. Answer the user's question based only on the expense data provided.
+
+{context}
+
+User Question: {user_question}
+
+Response rules:
+- Give the direct answer first in the first sentence.
+- If a numeric answer is available, state the exact number immediately.
+- Keep the full response to 1-3 short sentences.
+- Do not repeat the same number in multiple ways.
+- Do not hedge unnecessarily.
+- Do not add long caveats unless the data is actually missing or ambiguous.
+- If the question asks for a total in an existing category, provide that total directly.
+- If the exact answer is not available, say that clearly in one sentence and give the closest available figure.
+- Do not use phrases like "based on the provided data", "however", "nonetheless", "to summarize", or "the final answer is".
+
+Return only the answer text."""
+    
+    response = invoke_llm(prompt).strip()
+    return response
     return summary
 
 
-# Hero banner with enhanced styling
+# Hero banner with IBM branding
 st.markdown("""
 <div class="hero-banner">
-    <h1>✈️ AI Travel Expense Tracker</h1>
-    <p>Upload your travel receipts and let AI extract and analyze your expenses instantly</p>
+    <h1>💼 IBM Travel Expense Tracker</h1>
+    <p>Enterprise-grade expense management powered by IBM Watson AI</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Instructions section
 with st.container():
     st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
-        <h3 style="color: #1e3a8a; margin-top: 0;">📝 How it works</h3>
-        <ol style="color: #475569; line-height: 1.8;">
+    <div style="background: white; padding: 1.5rem; border-radius: 0; margin-bottom: 1.5rem; border: 1px solid #e0e0e0; border-left: 3px solid #0F62FE;">
+        <h3 style="color: #161616; margin-top: 0; font-weight: 600;">📝 How it works</h3>
+        <ol style="color: #525252; line-height: 1.8; font-size: 0.95rem;">
             <li><strong>Upload</strong> your PDF receipts (up to 10 files)</li>
             <li><strong>Submit</strong> to extract expense data using AI</li>
             <li><strong>Analyze</strong> to view interactive charts and insights</li>
@@ -373,12 +477,50 @@ with col4:
 # Submit button logic
 if submit_button:
     if uploaded_files:
-        with st.spinner("Processing receipts..."):
-            st.session_state.df = process_invoices(uploaded_files)
+        # Create progress bar and status text
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        file_status = st.empty()
+        
+        total_files = len(uploaded_files)
+        
+        # Progress callback function
+        def update_progress(completed, total, filename):
+            progress = int((completed / total) * 100)
+            progress_bar.progress(progress)
+            status_text.text(f"Processing: {completed}/{total} files completed")
+            file_status.text(f"✅ Completed: {filename}")
+        
+        status_text.text(f"Starting to process {total_files} file(s)...")
+        
+        try:
+            # Process with parallel execution and real-time progress updates
+            st.session_state.df = process_invoices(
+                uploaded_files,
+                max_workers=3,
+                progress_callback=update_progress
+            )
             st.session_state.summary = None
-        st.success(f"Successfully processed {len(uploaded_files)} file(s)!")
+            
+            # Show completion
+            progress_bar.progress(100)
+            status_text.text("✨ Processing complete!")
+            file_status.empty()
+            
+            # Clear progress indicators after a moment
+            import time
+            time.sleep(1)
+            progress_bar.empty()
+            status_text.empty()
+            
+            st.success(f"🎉 Successfully processed {total_files} file(s)!")
+        except Exception as e:
+            progress_bar.empty()
+            status_text.empty()
+            file_status.empty()
+            st.error(f"❌ Error processing files: {str(e)}")
     else:
-        st.warning("Please upload PDF files first.")
+        st.warning("⚠️ Please upload PDF files first.")
 
 # Display results if DataFrame exists
 if st.session_state.df is not None and not st.session_state.df.empty:
@@ -390,7 +532,7 @@ if st.session_state.df is not None and not st.session_state.df.empty:
     # Metric cards with enhanced styling
     st.markdown('<div class="fade-in">', unsafe_allow_html=True)
     st.markdown('<p class="section-header">📊 Overview</p>', unsafe_allow_html=True)
-    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    metric_col1, metric_col2, metric_col3 = st.columns(3)
     
     with metric_col1:
         st.metric(
@@ -413,13 +555,6 @@ if st.session_state.df is not None and not st.session_state.df.empty:
             delta=None
         )
     
-    with metric_col4:
-        avg_conf = df['Confidence'].mean()
-        st.metric(
-            label="✅ Avg Confidence",
-            value=f"{avg_conf:.1%}",
-            delta=None
-        )
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Budget Summary Section
@@ -476,11 +611,8 @@ if st.session_state.df is not None and not st.session_state.df.empty:
     display_df = df.copy()
     
     # Ensure we have the expected columns
-    expected_cols = ['Date', 'Vendor', 'Doc Type', 'Category', 'Description', 'Currency', 'Amount', 'Confidence']
+    expected_cols = ['Date', 'Vendor', 'Doc Type', 'Category', 'Description', 'Currency', 'Amount']
     display_df = display_df[expected_cols]
-    
-    # Format confidence as percentage using list comprehension
-    display_df['Confidence'] = [f"{x:.1%}" for x in display_df['Confidence']]
     
     # Rename with emojis
     display_df.columns = [
@@ -490,8 +622,7 @@ if st.session_state.df is not None and not st.session_state.df.empty:
         "🏷️ Category",
         "📝 Description",
         "💱 Currency",
-        "💰 Amount",
-        "✅ Confidence"
+        "💰 Amount"
     ]
     
     st.dataframe(
@@ -563,20 +694,64 @@ if st.session_state.df is not None and not st.session_state.df.empty:
     # Display summary if exists
     if st.session_state.summary:
         st.markdown("---")
-        st.markdown('<p class="section-header">🤖 AI-Powered Insights</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-header">🤖 Watson AI Insights</p>', unsafe_allow_html=True)
         st.markdown(f"""
         <div class="summary-box">
-            <p style="color: #1e3a8a; font-size: 1.05rem; line-height: 1.8; margin: 0;">
+            <p style="color: #161616; font-size: 1rem; line-height: 1.75; margin: 0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;">
                 {st.session_state.summary}
             </p>
         </div>
         """, unsafe_allow_html=True)
+    
+    # AI Chat Assistant Section
+    st.markdown("---")
+    st.markdown('<p class="section-header">💬 Chat with AI Assistant</p>', unsafe_allow_html=True)
+    st.markdown("Ask questions about your expenses and get instant insights!")
+    
+    # Display chat history
+    for i, (question, answer) in enumerate(st.session_state.chat_history):
+        with st.container():
+            st.markdown(f"""
+            <div style="background: #e8f4ff; padding: 1rem; border-radius: 0; margin-bottom: 0.5rem; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; border-left: 3px solid #0F62FE;">
+                <strong style="color: #0F62FE;">You:</strong> {question}
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style="background: white; padding: 1rem; border-radius: 0; margin-bottom: 1rem; border-left: 3px solid #0F62FE; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; line-height: 1.75; border: 1px solid #e0e0e0;">
+                <strong style="color: #0F62FE;">IBM Watson:</strong> {answer}
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # Chat input
+    with st.form(key="chat_form", clear_on_submit=True):
+        col_input, col_button = st.columns([4, 1])
+        with col_input:
+            user_question = st.text_input(
+                "Ask a question",
+                placeholder="e.g., What was my biggest expense? How much did I spend on hotels?",
+                label_visibility="collapsed"
+            )
+        with col_button:
+            ask_button = st.form_submit_button("Ask", use_container_width=True)
+    
+    if ask_button and user_question:
+        with st.spinner("🤔 Thinking..."):
+            answer = chat_with_expenses(user_question, df)
+            st.session_state.chat_history.append((user_question, answer))
+            st.rerun()
+    
+    # Clear chat button
+    if st.session_state.chat_history:
+        if st.button("🗑️ Clear Chat History"):
+            st.session_state.chat_history = []
+            st.rerun()
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <div class="footer">
-    <p>🚀 Powered by AI | Built with ❤️ using Streamlit</p>
-    <p style="font-size: 0.8rem; color: #94a3b8;">© 2026 AI Travel Expense Tracker</p>
+    <p style="color: #0F62FE; font-weight: 600; font-family: 'IBM Plex Sans', sans-serif;">💼 IBM Travel Expense Tracker</p>
+    <p style="font-size: 0.875rem; color: #525252;">Powered by IBM Watson AI | © 2026 International Business Machines Corporation</p>
+    <p style="font-size: 0.75rem; color: #8d8d8d;">IBM, the IBM logo, and Watson are trademarks of IBM Corp.</p>
 </div>
 """, unsafe_allow_html=True)

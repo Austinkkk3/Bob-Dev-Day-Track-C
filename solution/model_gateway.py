@@ -80,16 +80,26 @@ def invoke_llm(prompt: str) -> str:
         "model_id": LLM_NAME,
         "input": prompt,
         "parameters": {
-            "max_new_tokens": 2048,
+            "max_new_tokens": 1024,  # Reduced from 2048 for faster response
             "temperature": 0.0,
             "repetition_penalty": 1.05,
-            "stop_sequences": ["```"]
+            "stop_sequences": ["```", "\n\n\n"],  # Added extra stop sequence
+            "decoding_method": "greedy"  # Faster than sampling
         },
         "project_id": PROJECT_ID
     }
     
     # Make request
     response = requests.post(url, headers=headers, json=payload)
+    
+    # Debug: Print response details if there's an error
+    if response.status_code != 200:
+        print(f"Error Status Code: {response.status_code}")
+        print(f"Error Response: {response.text}")
+        print(f"API Key (first 10 chars): {API_KEY[:10] if API_KEY else 'None'}...")
+        print(f"Project ID: {PROJECT_ID}")
+        print(f"Cloud URL: {CLOUD_URL}")
+    
     response.raise_for_status()
     
     # Extract generated text
