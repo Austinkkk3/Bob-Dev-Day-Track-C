@@ -303,7 +303,7 @@ print(invoke_llm('Say hello in one sentence.'))
 
 This file handles PDF parsing and AI-powered data extraction.
 
-###Open Bob and paste this prompt:
+Open Bob and paste this prompt:
 
 ```
 Generate a Python file called doc_processing.py for processing travel expense PDF receipts.
