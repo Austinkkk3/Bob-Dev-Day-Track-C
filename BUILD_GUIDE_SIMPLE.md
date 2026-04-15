@@ -346,7 +346,7 @@ JSON parsing:
 
 Output:
 - Function process_invoices(uploaded_files) → pandas DataFrame
-- Columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount, Confidence
+- Columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount
 - Function analyze_invoices(df) → tuple of 3 Plotly figures:
     1. Horizontal bar chart: expenses by vendor (color #3B82F6)
     2. Donut chart: expenses by category (hole=0.4)
