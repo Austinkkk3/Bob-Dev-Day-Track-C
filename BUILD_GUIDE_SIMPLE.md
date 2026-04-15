@@ -312,48 +312,97 @@ Requirements:
 
 PDF parsing:
 - Use Docling to convert PDF bytes to Markdown text
-- Configure Docling with: do_ocr=False, do_table_structure=True
+- Configure Docling with: do_ocr=True, do_table_structure=True (high-fidelity mode — do NOT disable these)
+- Use PdfPipelineOptions and PdfFormatOption to pass options (do NOT pass do_ocr or do_table_structure as direct arguments to converter.convert())
+- Correct usage:
+    from docling.datamodel.base_models import InputFormat
+    from docling.datamodel.pipeline_options import PdfPipelineOptions
+    from docling.document_converter import DocumentConverter, PdfFormatOption
+    pipeline_options = PdfPipelineOptions()
+    pipeline_options.do_ocr = True
+    pipeline_options.do_table_structure = True
+    converter = DocumentConverter(
+        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
+    )
+    result = converter.convert(tmp_path)
 - Save PDF bytes to a temp file, convert, then delete the temp file
 
-Document type detection (from filename, case-insensitive):
-- hotel: keywords hotel, inn, marriott, hilton, hyatt, sheraton, westin, fairmont, resort, lodge, accommodation → doc_type = "hotel"
-- flight: keywords flight, airline, boarding, airways → doc_type = "flight"
-- meal: keywords meal, restaurant, food, dining, cafe, bistro → doc_type = "meal"
-- car: keywords car, rental, vehicle, hertz, avis, enterprise → doc_type = "car"
-- Default fallback (no keyword match): "generic"
-- Hotel keywords take highest priority
+Document type detection:
+- Implement _detect_doc_type(filename: str, text: str) -> str
+- Detection uses BOTH filename and document text content, with weighted scoring
+- Score each candidate type by counting keyword matches in filename (weight 3) and in text (weight 1)
+- Keywords per type:
+    hotel: hotel, inn, folio, marriott, hilton, hyatt, sheraton, westin, fairmont, resort, lodge, accommodation, room rate, check-in, check-out
+    flight: flight, airline, boarding, airways, airfare, itinerary, departure, arrival, seat, gate
+    meal: meal, restaurant, food, dining, cafe, bistro, menu, cuisine, eatery, tavern
+    car: car, rental, vehicle, hertz, avis, enterprise, budget rent, national car, mileage, odometer
+- Return the type with the highest score
+- If all scores are 0, return "generic"
+- No single type has blanket priority — scoring determines winner
 
 LLM extraction:
 - Write a separate extraction prompt for each of the 5 document types (hotel, flight, meal, car, generic)
-- Each prompt asks the LLM to return ONLY a JSON array (no markdown, no explanation)
-- Each extracted row must have these fields:
-    date (YYYY-MM-DD), vendor, doc_type, category, description, currency, amount, confidence (0.0-1.0)
-- Categories for hotel: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Miscellaneous
-- Categories for flight: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Miscellaneous
-- Categories for meal: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Miscellaneous
-- Categories for car: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Miscellaneous
-- For generic: extract ALL line items from mixed travel invoices (e.g. travel agency invoices). For each row, detect doc_type from the content itself — must be one of "Hotel", "Flight", "Meal", "Car Rental". Use all categories from all 4 types combined.
+- Each prompt instructs the LLM to return ONLY a valid JSON array — no markdown, no code fences, no explanation, no preamble
+- Each extracted row must have these exact fields:
+    date (YYYY-MM-DD or empty string if unknown), vendor, doc_type, category, description, currency, amount (numeric), confidence (0.0–1.0)
+
+- Hotel prompt must say:
+    "Extract every individual line item from this hotel folio. Each charge must be a separate JSON object.
+    Do not merge multiple charges into one row.
+    Categories: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Miscellaneous"
+
+- Flight prompt categories: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Miscellaneous
+
+- Meal prompt must say:
+    "Extract each menu item or charge as a separate line item. Do not merge multiple items into one row.
+    If the invoice shows a total only, extract it as one row.
+    Categories: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Miscellaneous"
+
+- Car prompt categories: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Miscellaneous
+
+- Generic prompt must say:
+    "Extract ALL line items. For each row, detect doc_type from the content — must be one of: Hotel, Flight, Meal, Car Rental.
+    Use all categories from all 4 types combined."
+
+- Summary / chat prompts (if any) must say:
+    "Answer directly in the first sentence. Do not restate the question, do not add preamble or commentary."
+
+Vendor extraction:
+- Implement _extract_vendor_from_text(text: str) -> str
+    - Look for vendor name in the first 10 lines of the document text
+    - Return the most prominent proper noun or company name found
+    - Return "Unknown" only if nothing is found
+- Implement _normalize_expenses(rows: list) -> list
+    - If vendor field is empty or "Unknown", call _extract_vendor_from_text on the raw text and fill it in
+    - If doc_type is missing, set it to the detected type from _detect_doc_type
+    - Strip whitespace from all string fields
 
 Amount parsing:
 - Handle currency symbols: $, €, £, ¥, ₹
 - Handle thousands separators: 1,234.56
 - Handle European decimal format: 1.234,56
-- Always apply abs() to the final amount (expenses are always positive)
+- Always apply abs() to the final parsed amount (all expenses are positive)
 
 JSON parsing:
 - Use regex to find the [...] array in LLM output
-- Return an empty list if no valid JSON is found
+- Strip any markdown code fences (``` or ```json) before parsing
+- Return an empty list [] if no valid JSON is found — do not raise exceptions
 
 Output:
 - Function process_invoices(uploaded_files) → pandas DataFrame
-- Columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount
+- Columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount, Confidence
 - Function analyze_invoices(df) → tuple of 3 Plotly figures:
     1. Horizontal bar chart: expenses by vendor (color #3B82F6)
     2. Donut chart: expenses by category (hole=0.4)
     3. Bar chart: expenses by document type (Hotel=#3B82F6, Flight=#A855F7, Meal=#10B981, Car Rental=#F59E0B)
-- Bar charts and pie/donut charts must use SEPARATE layout configs (pie charts do not support xaxis/yaxis)
+- CRITICAL: Bar charts and pie/donut charts must use SEPARATE layout config objects
+    - Do NOT apply xaxis or yaxis to any pie or donut chart — this causes a crash
+    - Bar chart layout: include xaxis, yaxis, font, plot_bgcolor, paper_bgcolor
+    - Pie/donut chart layout: include only font, plot_bgcolor, paper_bgcolor (no axis keys)
 - All charts: transparent background, Inter font
 
+Use only straight ASCII quotes (" and ') throughout. Do not use curly or smart quotes.
+Include all return statements explicitly — do not omit any return.
 Return only the complete Python file with no explanations.
 ```
 ----
