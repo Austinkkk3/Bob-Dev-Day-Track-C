@@ -513,23 +513,7 @@ The app opens automatically at **http://localhost:8501**.
 
 ---
 
-## Troubleshooting
 
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| `Total Amount shows $0.00` | LLM returned negative amounts | Make sure `abs()` is applied in `_normalize_row` in `doc_processing.py` |
-| `TypeError: object.__init__()` | Python 3.14 + wrong install order | Install pillow first with `--only-binary :all:`, then use `uv` |
-| `JSONDecodeError` | LLM returned markdown fences | Make sure `stop_sequences: ["` ``` `"]` is in `model_gateway.py` |
-| Document type wrong | Filename doesn't match keywords | Rename file to include keyword (e.g., `hilton_hotel.pdf`) |
-| `401 Unauthorized` | API Key not exchanged for token | Make sure `model_gateway.py` uses IAM token exchange, not raw API key |
-| Pie chart errors | Wrong layout applied to pie chart | Use separate layout dicts for bar vs pie charts |
-| `streamlit: command not found` | Streamlit not on PATH | Use `python3 -m streamlit run app.py` instead |
-| First run takes forever | Downloading Docling models (~2GB) | Wait 5–10 minutes. Do not interrupt. |
-| `ModuleNotFoundError: docling` | Dependencies not installed | Run `pip install -r requirements.txt` |
-| Charts don't appear | Clicked Analyze before Submit | Click "⚡ Submit" first, then "📊 Analyze" |
-| `400 Bad Request` on token call | Wrong Project ID | Check `PROJECT_ID` in `.env` — must be 36-character UUID |
-
----
 
 ## Advanced Configuration
 
