@@ -1,43 +1,63 @@
 
 ## ✨BONUS LAB 3: Time to Have a Conversation with BOB - If you want to inprove your website's UI design✨
 
-Copy and Paste this prompt into Bob and add any features you want Bob to include:
+## ✨ BONUS LAB 3: Make It Yours — Design Your App with Bob
+
+Your app works. Now make it look the way **you** want.
+
+In this lab, there's no fixed prompt to copy. Instead, you'll have a 
+real conversation with Bob to customize your app however you like.
+
 ---
-```
-I have an existing Streamlit app called app.py for an AI Travel Expense Tracker. I want to significantly improve the UI quality.
 
-Add these enhancements:
+### What Bob Can Do For You
 
-1. Enhanced CSS styling:
-- Gradient background for the entire app (#f8fafc to #e2e8f0)
-- Hero banner with gradient (blue tones) and fade-in animation
-- Hover effects on buttons (lift animation with shadow)
-- Hover effects on metric cards (elevation change)
-- Enhanced file uploader with dashed border and hover state
-- Smooth transitions on all interactive elements
-- Custom styled success/warning/error messages with gradients
-- Rounded corners and box shadows throughout
-- Hide Streamlit branding (footer and main menu)
+Tell Bob what you want in plain English — here are some ideas:
 
-2. Better organization:
-- Add "How it works" instruction section with numbered steps
-- Section headers with custom styling and bottom borders
-- Clear visual separators between sections
-- Add icons to all buttons (🚀 Submit, 📊 Analyze, 🤖 Generate Summary, 💾 Export CSV)
+**🎨 Visual Style**
+- "Change the color scheme to match my company's brand colors"
+- "Make the app look more professional / modern / minimal"
+- "Add a dark mode"
+- "Upload a screenshot of our company website and redesign the app to match it"
 
-3. Enhanced data display:
-- Metric cards with colored left borders and hover animations
-- Format confidence scores as percentages
-- Add emoji icons to all column headers (📅 Date, 🏢 Vendor, 📄 Doc Type, 🏷️ Category, 📝 Description, 💱 Currency, 💰 Amount, ✅ Confidence)
-- Set dataframe height to 400px for better scrolling
-- Chart titles with descriptive labels
+**🧩 Layout & Organization**
+- "Add a 'How it works' section with step-by-step instructions"
+- "Reorganize the layout so charts appear side by side"
+- "Add a sidebar with app settings"
 
-4. Professional touches:
-- AI summary displayed in a beautiful gradient box
-- Professional footer with branding
-- Fade-in animations for content
-- Better typography (improved font sizes, weights, line heights)
-- Text shadows on hero banner for depth
+**✨ Animations & Polish**
+- "Add hover effects to all buttons and cards"
+- "Add a fade-in animation when results appear"
+- "Make the hero banner more visually impressive"
 
-Return the complete modified app.py with all enhancements applied.
-```
+**📊 Data Display**
+- "Show a summary table at the top before the detailed results"
+- "Add a progress bar while receipts are being processed"
+- "Make the confidence score show as a color-coded badge"
+
+---
+
+### How to Use Bob for This
+
+1. Open Bob → switch to **Ask Mode**
+2. <img width="1157" alt="Ask bib" src="https://github.ibm.com/user-attachments/assets/17e155c2-1352-4e45-8803-960c335ce1ca" />
+
+3. Describe what you want — be as specific or as vague as you like
+4. Review what Bob suggests, ask follow-up questions, iterate
+5. When you're happy, click **Apply** and restart the app
+
+> 💡 **Tip — Brand Matching:**
+> Take a screenshot of your company's website or internal portal,
+> drag it into Bob, and say:
+> *"Redesign my app to match the brand colors and style in this screenshot."*
+> Bob will analyze the image and update your CSS automatically.
+
+---
+
+### There's No Wrong Answer
+
+This lab is open-ended on purpose. The goal is to get comfortable 
+having a conversation with Bob — describing what you want, reacting 
+to what it produces, and iterating until you're satisfied.
+
+That's the skill. Not copying prompts.
