@@ -1,5 +1,6 @@
 import os
 import time
+import random
 import requests
 from dotenv import load_dotenv
 from typing import Optional
@@ -80,32 +81,34 @@ def invoke_llm(prompt: str) -> str:
         "model_id": LLM_NAME,
         "input": prompt,
         "parameters": {
-            "max_new_tokens": 1024,  # Reduced from 2048 for faster response
+            "max_new_tokens": 4096,
             "temperature": 0.0,
             "repetition_penalty": 1.05,
-            "stop_sequences": ["```", "\n\n\n"],  # Added extra stop sequence
-            "decoding_method": "greedy"  # Faster than sampling
+            "decoding_method": "greedy"
         },
         "project_id": PROJECT_ID
     }
     
-    # Make request
-    response = requests.post(url, headers=headers, json=payload)
-    
-    # Debug: Print response details if there's an error
-    if response.status_code != 200:
-        print(f"Error Status Code: {response.status_code}")
-        print(f"Error Response: {response.text}")
-        print(f"API Key (first 10 chars): {API_KEY[:10] if API_KEY else 'None'}...")
-        print(f"Project ID: {PROJECT_ID}")
-        print(f"Cloud URL: {CLOUD_URL}")
-    
+    # Make request with retry on 429
+    max_retries = 5
+    for attempt in range(max_retries):
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code == 429:
+            wait = (2 ** attempt) * 2 + random.uniform(0, 1)
+            print(f"Rate limited (429). Retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})...")
+            time.sleep(wait)
+            continue
+
+        if response.status_code != 200:
+            print(f"Error Status Code: {response.status_code}")
+            print(f"Error Response: {response.text}")
+
+        response.raise_for_status()
+        result = response.json()
+        return result["results"][0]["generated_text"]
+
     response.raise_for_status()
-    
-    # Extract generated text
-    result = response.json()
-    generated_text = result["results"][0]["generated_text"]
-    
-    return generated_text
+    return ""
 
 # Made with Bob

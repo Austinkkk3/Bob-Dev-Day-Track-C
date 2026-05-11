@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from doc_processing import process_invoices, analyze_invoices
+from doc_processing import process_invoices, analyze_invoices, clear_cache
 from model_gateway import invoke_llm
 
 
@@ -226,6 +226,10 @@ if 'car_budget' not in st.session_state:
     st.session_state.car_budget = 700
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'debug_info' not in st.session_state:
+    st.session_state.debug_info = {}
+if 'processed_hashes' not in st.session_state:
+    st.session_state.processed_hashes = set()
 
 # Sidebar - Budget Settings
 with st.sidebar:
@@ -305,38 +309,52 @@ def generate_summary(df: pd.DataFrame) -> str:
     except:
         date_info = ""
     
-    # Build prompt
-    prompt = f"""You are writing a short travel expense summary for an end user.
+    # Find biggest spending category
+    top_category = ""
+    top_category_amount = -1.0
+    for category_name, category_amount in category_breakdown.items():
+        if category_amount > top_category_amount:
+            top_category = category_name
+            top_category_amount = category_amount
 
-Write exactly 3 short sentences in simple plain English.
-Focus only on:
-1. how much was spent,
-2. how much budget is left or whether the budget was exceeded,
-3. one or two simple suggestions.
+    # Build prompt using fill-in template
+    budget_status = (
+        f"You are ${abs(budget_remaining):.2f} over budget."
+        if budget_remaining < 0
+        else f"You have ${budget_remaining:.2f} left in your budget."
+    )
 
-Return only the final summary text.
-Do not analyze the writing.
-Do not revise the response.
-Do not add extra explanation.
-Do not mention line items, top vendor, categories, or document types unless needed for a very short suggestion.
-Keep it clear and practical.
+    prompt = f"""Complete this travel expense summary by filling in the blanks. Output only the 3 completed sentences, nothing else.
 
-Statistics:
-- Total expenses: ${total_amount:.2f}
-- Total budget: ${total_budget:.2f}
-- Budget remaining: ${budget_remaining:.2f}
-- Number of line items: {num_items}
-- Top vendor: {top_vendor} (${top_vendor_amount:.2f})
-- Document type breakdown: {doc_type_str}
-- {date_info if date_info else "Date information unavailable."}
+Sentence 1: "You spent $[TOTAL] on this trip, mostly on [TOP_CATEGORY]."
+Sentence 2: "[BUDGET_STATUS]"
+Sentence 3: "Consider [ONE_SIMPLE_TIP] to manage future travel costs."
 
-Example style:
-"You spent $1200.00 so far. You have $800.00 left in your budget. Try to reduce hotel and flight costs if you want to stay within budget."
+Fill in using these values:
+- [TOTAL] = {total_amount:.2f}
+- [TOP_CATEGORY] = {top_category}
+- [BUDGET_STATUS] = {budget_status}
+- [ONE_SIMPLE_TIP] = one short practical tip based on the top spending category
 
-Write a concise summary in that style."""
-    
-    # Call LLM
-    summary = invoke_llm(prompt).strip()
+Output only the 3 sentences. No explanation. No revision. No "However". No analysis."""
+
+    # Call LLM and strip any meta-commentary
+    raw = invoke_llm(prompt).strip()
+
+    # Remove lines that contain meta-commentary patterns
+    lines = raw.splitlines()
+    clean_lines = [
+        line for line in lines
+        if line.strip()
+        and not line.strip().startswith("However")
+        and not line.strip().startswith("Note")
+        and not line.strip().startswith("Here")
+        and not line.strip().startswith("The above")
+        and not line.strip().startswith("To make")
+        and "can be combined" not in line
+        and "sentences long" not in line
+    ]
+    summary = " ".join(clean_lines[:3]).strip()
     return summary
 
 def get_expense_context(df: pd.DataFrame) -> str:
@@ -410,7 +428,6 @@ Return only the answer text."""
     
     response = invoke_llm(prompt).strip()
     return response
-    return summary
 
 
 # Hero banner with IBM branding
@@ -452,7 +469,7 @@ if uploaded_files and len(uploaded_files) > 10:
 
 # Action buttons with icons
 st.markdown("---")
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     submit_button = st.button("🚀 Submit", type="primary", use_container_width=True)
@@ -474,51 +491,102 @@ with col4:
             use_container_width=True
         )
 
+with col5:
+    if st.button("🗑️ Clear All", use_container_width=True):
+        st.session_state.df = None
+        st.session_state.summary = None
+        st.session_state.debug_info = {}
+        st.session_state.processed_hashes = set()
+        st.session_state.chat_history = []
+        st.rerun()
+
 # Submit button logic
 if submit_button:
     if uploaded_files:
-        # Create progress bar and status text
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-        file_status = st.empty()
-        
-        total_files = len(uploaded_files)
-        
-        # Progress callback function
-        def update_progress(completed, total, filename):
-            progress = int((completed / total) * 100)
-            progress_bar.progress(progress)
-            status_text.text(f"Processing: {completed}/{total} files completed")
-            file_status.text(f"✅ Completed: {filename}")
-        
-        status_text.text(f"Starting to process {total_files} file(s)...")
-        
-        try:
-            # Process with parallel execution and real-time progress updates
-            st.session_state.df = process_invoices(
-                uploaded_files,
-                max_workers=3,
-                progress_callback=update_progress
-            )
-            st.session_state.summary = None
-            
-            # Show completion
-            progress_bar.progress(100)
-            status_text.text("✨ Processing complete!")
-            file_status.empty()
-            
-            # Clear progress indicators after a moment
-            import time
-            time.sleep(1)
-            progress_bar.empty()
-            status_text.empty()
-            
-            st.success(f"🎉 Successfully processed {total_files} file(s)!")
-        except Exception as e:
-            progress_bar.empty()
-            status_text.empty()
-            file_status.empty()
-            st.error(f"❌ Error processing files: {str(e)}")
+        import hashlib as _hashlib
+
+        # Filter out already-processed files
+        new_files = []
+        skipped = []
+        for f in uploaded_files:
+            file_hash = _hashlib.md5(f.getvalue()).hexdigest()
+            if file_hash in st.session_state.processed_hashes:
+                skipped.append(f.name)
+            else:
+                new_files.append((f, file_hash))
+
+        if skipped:
+            st.info(f"⏭️ Skipped (already processed): {', '.join(skipped)}")
+
+        if not new_files:
+            st.warning("⚠️ All uploaded files have already been processed.")
+        else:
+            files_to_process = [f for f, _ in new_files]
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            file_status = st.empty()
+            total_files = len(files_to_process)
+
+            def update_progress(completed, total, filename):
+                progress = int((completed / total) * 100)
+                progress_bar.progress(progress)
+                status_text.text(f"Processing: {completed}/{total} files completed")
+                file_status.text(f"✅ Completed: {filename}")
+
+            status_text.text(f"Processing {total_files} new file(s)...")
+
+            try:
+                new_df, new_debug = process_invoices(
+                    files_to_process,
+                    max_workers=2,
+                    progress_callback=update_progress
+                )
+
+                # Append new results to existing data
+                if st.session_state.df is not None and not st.session_state.df.empty:
+                    import pandas as pd
+                    st.session_state.df = pd.concat(
+                        [st.session_state.df, new_df], ignore_index=True
+                    )
+                else:
+                    st.session_state.df = new_df
+
+                # Only mark a file as processed if it produced at least 1 row
+                # (so failed files due to 429 can be retried on next submit)
+                successfully_processed = set()
+                for f, file_hash in new_files:
+                    file_rows = new_df[new_df.index >= 0] if not new_debug.get(f.name, "").startswith("ERROR") else None
+                    if not new_debug.get(f.name, "").startswith("ERROR"):
+                        successfully_processed.add(file_hash)
+
+                st.session_state.processed_hashes.update(successfully_processed)
+                failed_files = [f.name for f, fh in new_files if fh not in successfully_processed]
+
+                st.session_state.debug_info.update(new_debug)
+                st.session_state.summary = None
+
+                progress_bar.progress(100)
+                status_text.text("✨ Processing complete!")
+                file_status.empty()
+
+                import time
+                time.sleep(1)
+                progress_bar.empty()
+                status_text.empty()
+
+                total_so_far = len(st.session_state.processed_hashes)
+                st.success(f"🎉 Added {total_files} file(s). Total files processed: {total_so_far}")
+                if failed_files:
+                    st.warning(f"⚠️ These files failed (will retry on next Submit): {', '.join(failed_files)}")
+                if st.session_state.debug_info:
+                    with st.expander("🔍 Debug Info (click to expand)"):
+                        for fname, info in st.session_state.debug_info.items():
+                            st.text(f"{fname}: {info}")
+            except Exception as e:
+                progress_bar.empty()
+                status_text.empty()
+                file_status.empty()
+                st.error(f"❌ Error processing files: {str(e)}")
     else:
         st.warning("⚠️ Please upload PDF files first.")
 
@@ -537,7 +605,7 @@ if st.session_state.df is not None and not st.session_state.df.empty:
     with metric_col1:
         st.metric(
             label="📁 Files Processed",
-            value=len(uploaded_files) if uploaded_files else 0,
+            value=len(st.session_state.processed_hashes),
             delta=None
         )
     
@@ -637,14 +705,12 @@ if st.session_state.df is not None and not st.session_state.df.empty:
         st.markdown("---")
         st.markdown('<p class="section-header">📈 Analytics Dashboard</p>', unsafe_allow_html=True)
         with st.spinner("📊 Generating interactive charts..."):
-            # Pass category budgets to analyze_invoices
-            category_budgets = {
-                'Hotel': st.session_state.hotel_budget,
-                'Flight': st.session_state.flight_budget,
-                'Meal': st.session_state.meal_budget,
-                'Car Rental': st.session_state.car_budget
-            }
-            result = analyze_invoices(df, category_budgets)
+            result = analyze_invoices(df, budgets={
+                "Hotel": st.session_state.hotel_budget,
+                "Flight": st.session_state.flight_budget,
+                "Meal": st.session_state.meal_budget,
+                "Car Rental": st.session_state.car_budget,
+            })
         
         # Handle both 3-figure and 4-figure return values
         if len(result) == 4:
