@@ -326,6 +326,7 @@ PDF parsing:
     )
     result = converter.convert(tmp_path)
 - Save PDF bytes to a temp file, convert, then delete the temp file
+- Cache the DocumentConverter instance at module level to avoid re-initialization on every call
 
 Document type detection:
 - Implement _detect_doc_type(filename: str, text: str) -> str
@@ -342,64 +343,89 @@ Document type detection:
 
 LLM extraction:
 - Write a separate extraction prompt for each of the 5 document types (hotel, flight, meal, car, generic)
+- Each prompt must end with a literal "[" character to prime the LLM to output a JSON array directly
 - Each prompt instructs the LLM to return ONLY a valid JSON array — no markdown, no code fences, no explanation, no preamble
 - Each extracted row must have these exact fields:
-    date (YYYY-MM-DD or empty string if unknown), vendor, doc_type, category, description, currency, amount (numeric), confidence (0.0–1.0)
+    date (YYYY-MM-DD or empty string if unknown), vendor, doc_type, category, description, currency, amount (numeric), confidence (0.0-1.0)
 
 - Hotel prompt must say:
     "Extract every individual line item from this hotel folio. Each charge must be a separate JSON object.
     Do not merge multiple charges into one row.
-    Categories: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Miscellaneous"
+    Categories: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Service Charge, Miscellaneous"
 
-- Flight prompt categories: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Miscellaneous
+- Flight prompt categories: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Taxes & Fees, Miscellaneous
 
 - Meal prompt must say:
     "Extract each menu item or charge as a separate line item. Do not merge multiple items into one row.
     If the invoice shows a total only, extract it as one row.
-    Categories: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Miscellaneous"
+    Categories: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Taxes & Fees, Gratuity, Miscellaneous"
 
-- Car prompt categories: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Miscellaneous
+- Car prompt categories: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Service Charge, Miscellaneous
 
 - Generic prompt must say:
     "Extract ALL line items. For each row, detect doc_type from the content — must be one of: Hotel, Flight, Meal, Car Rental.
     Use all categories from all 4 types combined."
 
-- Summary / chat prompts (if any) must say:
-    "Answer directly in the first sentence. Do not restate the question, do not add preamble or commentary."
-
 Vendor extraction:
 - Implement _extract_vendor_from_text(text: str) -> str
     - Look for vendor name in the first 10 lines of the document text
-    - Return the most prominent proper noun or company name found
+    - Skip lines that match common header keywords: invoice, folio, date, page, guest number, charges, credits, description
+    - Return the first line containing at least one letter and at least 3 characters
+    - Fallback: return the first sequence of capitalized words found in the top lines
     - Return "Unknown" only if nothing is found
-- Implement _normalize_expenses(rows: list) -> list
-    - If vendor field is empty or "Unknown", call _extract_vendor_from_text on the raw text and fill it in
-    - If doc_type is missing, set it to the detected type from _detect_doc_type
+- Implement _normalize_expenses(rows: list, filename: str, text: str) -> list
+    - If vendor field is empty or "Unknown", call _extract_vendor_from_text(text) and fill it in
+    - Always set doc_type from _detect_doc_type(filename, text) — do NOT rely on the LLM's returned doc_type field
+    - Use this mapping for doc_type: hotel -> "Hotel", flight -> "Flight", meal -> "Meal", car -> "Car Rental", generic -> ""
     - Strip whitespace from all string fields
+    - Backfill any missing required fields with empty string (for strings) or 0.0 (for amount/confidence)
 
 Amount parsing:
+- Implement _parse_amount(amount_str) -> float
 - Handle currency symbols: $, €, £, ¥, ₹
 - Handle thousands separators: 1,234.56
-- Handle European decimal format: 1.234,56
+- Handle European decimal format: 1.234,56 and 1,5 (comma as decimal separator with any number of decimal digits)
 - Always apply abs() to the final parsed amount (all expenses are positive)
+- Return 0.0 if parsing fails
 
 JSON parsing:
-- Use regex to find the [...] array in LLM output
+- Implement _parse_json_from_llm(llm_output: str) -> list
+- Prepend "[" to the output before parsing (because the prompt ends with "[" to prime the LLM)
 - Strip any markdown code fences (``` or ```json) before parsing
+- Strategy 1: use brace-depth scanning to find the [...] array boundary and parse it
+- Strategy 2: extract all top-level {...} objects using brace counting and parse each individually
+- Strategy 3: attempt json.loads() on the full cleaned output as fallback
 - Return an empty list [] if no valid JSON is found — do not raise exceptions
 
-Output:
-- Function process_invoices(uploaded_files) → pandas DataFrame
-- Columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount, Confidence
-- Function analyze_invoices(df) → tuple of 3 Plotly figures:
-    1. Horizontal bar chart: expenses by vendor (color #3B82F6)
+File caching:
+- Cache processed files at module level using a dict mapping MD5 hash -> extracted rows
+- On each file, compute MD5 of the PDF bytes and check the cache before calling Docling or the LLM
+- Export a clear_cache() function that resets the file cache dict to {}
+
+Output functions:
+- process_invoices(uploaded_files, max_workers: int = 2, progress_callback=None) -> tuple[pd.DataFrame, dict[str, str]]
+    - Process files in parallel using ThreadPoolExecutor(max_workers=max_workers)
+    - After each file completes (success or failure), call progress_callback(completed, total, filename) if provided
+    - Catch per-file exceptions and store them in debug_info as "ERROR: {exception}"
+    - If a file produces 0 normalized rows and no exception, set its debug string to "ERROR: 0 rows extracted — {debug details}"
+    - Return (DataFrame, debug_info) where debug_info maps filename -> debug string
+    - DataFrame columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount, Confidence
+    - If no rows at all, return an empty DataFrame with those columns
+
+- analyze_invoices(df, budgets: dict | None = None) -> tuple of 4 Plotly figures:
+    1. Horizontal bar chart: total expenses by vendor, sorted ascending, color #3B82F6
     2. Donut chart: expenses by category (hole=0.4)
     3. Bar chart: expenses by document type (Hotel=#3B82F6, Flight=#A855F7, Meal=#10B981, Car Rental=#F59E0B)
+    4. Grouped bar chart: Budget vs Actual per category (Hotel, Flight, Meal, Car Rental)
+       - "Actual" bars colored per category; "Budget" bars use rgba(0,0,0,0.15) fill with colored border (width 2)
+       - barmode="overlay", legend horizontal at y=1.1
+       - If budgets is None, use {Hotel: 0, Flight: 0, Meal: 0, Car Rental: 0}
+
 - CRITICAL: Bar charts and pie/donut charts must use SEPARATE layout config objects
     - Do NOT apply xaxis or yaxis to any pie or donut chart — this causes a crash
     - Bar chart layout: include xaxis, yaxis, font, plot_bgcolor, paper_bgcolor
     - Pie/donut chart layout: include only font, plot_bgcolor, paper_bgcolor (no axis keys)
-- All charts: transparent background, Inter font
+- All charts: transparent background (rgba(0,0,0,0)), Inter font
 
 Use only straight ASCII quotes (" and ') throughout. Do not use curly or smart quotes.
 Include all return statements explicitly — do not omit any return.
@@ -418,7 +444,7 @@ Requirements:
 Imports:
 - import streamlit as st
 - import pandas as pd
-- from doc_processing import process_invoices, analyze_invoices
+- from doc_processing import process_invoices, analyze_invoices, clear_cache
 - from model_gateway import invoke_llm
 
 General rules:
@@ -427,9 +453,9 @@ General rules:
 - Use only straight ASCII quotes (" and ').
 - Do not use curly quotes.
 - Include all required helper functions directly inside app.py.
-- Do not assume any external helper exists unless explicitly listed below.
+- Do not assume any external helper exists unless explicitly listed above.
 - Do NOT include Astra DB, database connections, authentication, or chat interface.
-- Do NOT include budget sidebar, budget inputs, or budget tracking unless explicitly requested.
+- Do NOT include budget sidebar, budget inputs, or budget tracking.
 - Keep the code clean, runnable, and self-contained except for the imported modules above.
 
 Page setup:
@@ -451,9 +477,10 @@ Styling:
   - a badge reading "Powered by IBM watsonx.ai"
 
 Session state:
-- Initialize:
-  - st.session_state.df = None if not already set
-  - st.session_state.summary = None if not already set
+- Initialize the following if not already set:
+  - st.session_state.df = None
+  - st.session_state.summary = None
+  - st.session_state.processed_hashes = set()
 
 Helper function:
 - Define a function generate_summary(df: pd.DataFrame) -> str inside app.py
@@ -493,46 +520,49 @@ Main layout:
   - accept PDF only
   - allow multiple files
   - maximum 10 files
-- If more than 10 files are uploaded, show an error and only process the first 10
+- If more than 10 files are uploaded, show an error and truncate to the first 10
 
 Buttons:
 - Create exactly 4 controls in one row:
-  1. Submit
-  2. Analyze
-  3. Generate Summary
-  4. Export CSV
-- Submit should be primary
-- Analyze and Generate Summary should be secondary
-- Export CSV should be a download button that appears only when data exists
+  1. Submit (primary)
+  2. Analyze (secondary)
+  3. Generate Summary (secondary)
+  4. Export CSV — a st.download_button that appears only when st.session_state.df is not None
+- Also include a Clear All button that:
+  - resets st.session_state.df to None
+  - resets st.session_state.summary to None
+  - resets st.session_state.processed_hashes to an empty set()
+  - calls clear_cache()
+  - calls st.rerun()
 
 Submit behavior:
 - When Submit is clicked:
   - if no files are uploaded, show a warning
-  - otherwise show:
-    - a progress bar created with st.progress(0)
-    - a status text placeholder
-  - call process_invoices(uploaded_files)
-  - if process_invoices supports progress updates, reflect them in the progress bar
-  - otherwise simulate file-by-file progress updates in app.py before or after processing so the UI still shows progress
-  - progress text should read like:
-    - "Processing file 2 of 3: marriott_hotel.pdf..."
-  - after processing completes:
-    - clear the progress bar
-    - clear the status text
-    - store result in st.session_state.df
-    - reset st.session_state.summary to None
-    - show a success message
+  - filter out files whose MD5 hash (computed from file.getvalue()) is already in st.session_state.processed_hashes
+  - if all files were already processed, show a warning and stop
+  - for new files only:
+    - show a progress bar with st.progress(0) and a status text placeholder
+    - define a progress_callback(completed, total, filename) function that updates the progress bar and status text
+      with text like: "Processing file 2 of 3: marriott_hotel.pdf..."
+    - call: df, debug_info = process_invoices(new_files, max_workers=2, progress_callback=progress_callback)
+    - after processing:
+      - clear the progress bar and status text
+      - append new rows to st.session_state.df using pd.concat (or assign directly if df was None)
+      - add successfully processed file hashes to st.session_state.processed_hashes
+        (a file is successful if its filename does not appear in debug_info with a value starting with "ERROR")
+      - reset st.session_state.summary to None
+      - show a success message
+      - if any files failed, show a warning listing their filenames
 
 Results section:
-- Show this section only if st.session_state.df exists and is not empty
+- Show this section only if st.session_state.df is not None and not empty
 - Display exactly 3 metric cards:
-  1. Files Processed
-  2. Line Items
-  3. Total Amount
-- Total Amount must be formatted as $X,XXX.XX
+  1. Files Processed (from len(st.session_state.processed_hashes))
+  2. Line Items (from len(df))
+  3. Total Amount formatted as $X,XXX.XX
 
 DataFrame display:
-- Show a styled dataframe with emoji column headers.
+- Show a styled dataframe with emoji column headers
 - Use exactly these 7 display columns in this order:
   - 📅 Date
   - 🏢 Vendor
@@ -541,45 +571,34 @@ DataFrame display:
   - 📝 Description
   - 💱 Currency
   - 💵 Amount
-- The displayed dataframe must map from these raw columns:
-  - Date
-  - Vendor
-  - Doc Type
-  - Category
-  - Description
-  - Currency
-  - Amount
-- Do not include Confidence anywhere.
-- Do not reference a Confidence column.
-- Use st.dataframe with wide layout.
+- Map from raw columns: Date, Vendor, Doc Type, Category, Description, Currency, Amount
+- Do not include Confidence anywhere
+- Use st.dataframe with use_container_width=True and hide_index=True
 
 Analyze behavior:
 - When Analyze is clicked:
   - if no processed data exists, show a warning
-  - otherwise call analyze_invoices(st.session_state.df)
-  - display all 3 returned Plotly charts with st.plotly_chart(..., use_container_width=True)
+  - otherwise call: vendor_chart, category_chart, doc_type_chart, _ = analyze_invoices(st.session_state.df)
+  - display the 3 charts (vendor, category, doc type) using st.plotly_chart(..., use_container_width=True)
+  - do NOT display the 4th chart (budget vs actual) — there are no budget inputs in this app
 
 Generate Summary behavior:
 - When Generate Summary is clicked:
-  - if no processed data exists, show a warning with the text:
-    "Please upload and submit receipts first"
+  - if no processed data exists, show a warning: "Please upload and submit receipts first"
   - otherwise:
-    - show st.spinner("✨ Generating AI summary...")
+    - show st.spinner("Generating AI summary...")
     - call generate_summary(st.session_state.df)
     - store the result in st.session_state.summary
-- If st.session_state.summary is not empty, display it using st.info()
+- If st.session_state.summary is not None and not empty, display it using st.info()
 
 Export CSV behavior:
 - If processed data exists:
   - convert st.session_state.df to CSV without index
-  - expose it through st.download_button
-  - file name should be expenses.csv
-  - mime type should be text/csv
+  - expose through st.download_button with file_name="expenses.csv" and mime="text/csv"
 
 Error handling:
 - Do not crash if date parsing fails
-- Do not crash if some expected columns are missing
-- If needed, safely create missing columns with empty strings before display
+- Do not crash if some expected columns are missing — safely create them with empty strings before display
 - All return statements must be explicit
 - The final code must be runnable as a Streamlit app
 
