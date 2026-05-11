@@ -416,7 +416,7 @@ def _process_single_file(file) -> tuple[list[dict[str, Any]], str]:
     normalized_rows = _normalize_expenses(rows, filename, markdown_text)
 
     llm_preview = repr(llm_output.strip()[:300])
-    debug = (
+    debug_body = (
         f"detected_type={detected_type}, "
         f"markdown_len={md_len}, "
         f"llm_output_len={len(llm_output.strip())}, "
@@ -424,6 +424,10 @@ def _process_single_file(file) -> tuple[list[dict[str, Any]], str]:
         f"rows_normalized={len(normalized_rows)}, "
         f"llm_preview={llm_preview}"
     )
+    if not normalized_rows:
+        debug = f"ERROR: 0 rows extracted — {debug_body}"
+    else:
+        debug = debug_body
     print(f"[DEBUG] {filename}: {debug}")
 
     _file_cache[cache_key] = normalized_rows
