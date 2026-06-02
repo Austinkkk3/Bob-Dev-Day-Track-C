@@ -237,7 +237,7 @@ Then run this command to create the file:
 cat > .env << 'EOF'
 API_KEY=paste_your_api_key_here
 PROJECT_ID=paste_your_project_id_here
-CLOUD_URL=https://us-south.ml.cloud.ibm.com
+CLOUD_URL= paste_your_URL_here For example: https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
 EOF
 ```
