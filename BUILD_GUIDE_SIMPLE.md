@@ -271,7 +271,7 @@ LLM_NAME=ibm/granite-3-8b-instruct
 
 ---
 
-## Step 4: Generate `model_gateway.py` with Bob
+## Step 4: Generate `model_gateway.py` with Bob (Bob Advanced Model is Recommended)
 
 This file handles the connection to watsonx.ai using the REST API.
 
