@@ -81,9 +81,39 @@ uv pip install -r requirements.txt
 
 ### Required Accounts
 
+To access and use IBM watsonx products for this Bobathon, participants must create an
+IBMid to log into your IBM Cloud account. This account will provide the necessary environment
+to work with the supporting IBM products for this hackathon.
+
+- **Creating an IBMid**
+
+You must have an IBMid to sign into IBM Cloud. With an IBMid, you can use your email login
+ to log into all IBM products and services. If you don’t have an existing
+IBMid, follow the procedure below to create one.
+1. Create an IBMid by accessing the [Create your IBM account](https://www.ibm.com/account/reg/us-en/signup?formid=urx-19776&target=https%3A%2F%2Flogin.ibm.com%2Foidc%2Fendpoint%2Fdefault%2Fauthorize%3FqsId%3Db3f11bc3-60d2-45e8-82ae-8bc09a47bcc7%26client_id%3DMyIBMLondonProdCI) page.
+2. Enter all required information in the fields provided 
+3. Select Next. You will receive an email from IBM Security that contains a one-time
+verification code.
+4. In the verification token field, enter the code that is provided in the email.
+5. Click submit.
+6. An email will be sent to you from IBM Security indicating that your IBMid account
+creation was successful and that your account is activated.
+
 - **IBM Cloud Account** (free tier available) — sign up at [cloud.ibm.com](https://cloud.ibm.com)
 
----
+-**Accessing and utilizing IBM watsonx products**
+
+Once you and your team are assigned Cloud environments, be sure to accept the environment
+cluster invitation that will be sent to your email. It should look something like this:
+
+<img width="603" alt="Screenshot 2026-06-02 at 9 50 14 AM" src="https://github.ibm.com/user-attachments/assets/9d6e349b-8dfd-451c-b549-a43ae489d7dd" />
+
+
+-**IMPORTANT: You must click the “Join now” to get access, and ensure you log into IBM Cloud**
+using the same email you used for the IBMid setup. Not clicking the join now button or using a
+different email will not give you proper access to the environments!
+To begin building your solution, explore the capabilities and resources for each IBM watsonx
+product enabled for this hackathon.
 
 ## Get Your Credentials
 
