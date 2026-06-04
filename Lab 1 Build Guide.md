@@ -40,113 +40,55 @@ If you don't have Python installed, follow these steps:
 3. Open the downloaded `.pkg` file and follow the installer
 4. When done, open Terminal and run `python3 --version` to confirm
 
-**Windows:**
-# 🐍 Installing Python 3.13 with Python Install Manager
+**Windows**:
+1. Go to [python.org/downloads](https://python.org/downloads, Download and install Python Install Manager
+2. Open Python Install Manager when installation is complete
+3. In the Python Install Manager window, run:
 
-## 📥 Step 1: Install Python Install Manager
+   ```bash
+   py install 3.13
+   ```
 
-Download and install **Python Install Manager**.
+4. Wait for Python 3.13 to finish installing
+5. Open Command Prompt and run:
 
-After installation, it will open a command prompt–like interface where you can install specific Python versions.
+   ```bash
+   py -3.13 --version
+   ```
 
----
+6. If the command is not recognized, add Python to your PATH:
+   - Open **Edit the system environment variables**
+   - Click **Environment Variables**
+   - Edit the **Path** variable
+   - Add the Python installation directory and Scripts directory
+   - restart your device
+7. Open a new Command Prompt and run:
 
-## ⚙️ Step 2: Install Python 3.13
+   ```bash
+   py -3.13 --version
+   ```
 
-In the Python Install Manager window, run:
+   to confirm the installation
 
-```bash
-py install 3.13
-```
-
-⏳ Wait for the installation to complete before proceeding.
-
----
-
-## 🔍 Step 3: Verify Python Was Added to PATH
-
-Installing Python through Python Install Manager **does not always guarantee that Python is added to your system PATH**.
-
-Open a new Command Prompt and run:
-
-```bash
-py -3.13 --version
-```
-
-Expected output:
-
-```text
-Python 3.13.x
-```
-
-If the command is not recognized, continue to the PATH configuration steps below.
-
----
-
-## 🛠️ Step 4: Add Python to PATH (If Required)
-
-1. Open the **Start Menu** and search for **Environment Variables**.
-2. Select **Edit the system environment variables**.
-3. Click **Environment Variables**.
-4. Under **User variables**, select **Path** and click **Edit**.
-5. Add the Python installation directory and its **Scripts** directory.
-6. Save all changes and restart your device.
-
-
-
----
-
-## ✅ Step 5: Verify PATH Configuration
-
-Run:
-
-```bash
-py -3.13 --version
-```
-
-If the version is displayed correctly, Python is installed and configured successfully.
-
----
-
-# ▶️ Running Python Scripts
-
-To ensure your scripts use **Python 3.13**, always run them with:
+> **Note for Python 3.14 users:** If you already have Python 3.14 installed, you must still install Python 3.13 using the steps above. When running scripts, always use:
 
 ```bash
 py -3.13 YOURFILE.py
 ```
 
-
-> 🎯 This guarantees the script runs with Python 3.13, even if other Python versions are installed.
-
----
-
-# ⚠️ Note for Python 3.14 Users
-
-If you already have **Python 3.14** installed, you must still follow the steps above to install **Python 3.13**.
-
-When running scripts, explicitly specify Python 3.13:
-
-```bash
-py -3.13 YOURFILE.py
-```
-
-🚫 Avoid using:
+instead of:
 
 ```bash
 python YOURFILE.py
 ```
 
-or
+or:
 
 ```bash
 py YOURFILE.py
 ```
 
-These commands may use Python 3.14 instead of Python 3.13, which can cause compatibility issues.
-
----
-
+to ensure Python 3.13 is used.
 
 
 
@@ -154,7 +96,8 @@ These commands may use Python 3.14 instead of Python 3.13, which can cause compa
 
 > 💡 pip comes bundled with Python 3.13. If `pip3 --version` gives an error,
 > run `python3 -m ensurepip` to install it.
-```
+---
+
 ### Installing IBM Bob
 
 1. Search for IBM Bob online
