@@ -8,14 +8,14 @@ This guide assumes no prior context. Follow every step to build a working applic
 
 ## What This Application Does
 
-✅ Upload up to 10 PDF receipts (hotels, flights, meals, car rentals)  
-✅ Auto-detect document type from filename  
-✅ Extract structured expense data using IBM watsonx.ai Granite 3 LLM  
-✅ Display results in a table with 8 columns  
-✅ Show 4 metric cards (Files Processed, Line Items, Total Amount, Avg Confidence)  
-✅ Generate 4 interactive Plotly charts (by vendor, by category, by document type)  
-✅ Export data to CSV  
-✅ Generate an AI-written plain-English summary of your trip expenses  
+✅ Upload up to 10 PDF receipts (hotels, flights, meals, car rentals). 
+✅ Auto-detect document type from filename.
+✅ Extract structured expense data using IBM watsonx.ai Granite 3 LLM. 
+✅ Display results in a table with 8 columns. 
+✅ Show 4 metric cards (Files Processed, Line Items, Total Amount, Avg Confidence).  
+✅ Generate 4 interactive Plotly charts (by vendor, by category, by document type).  
+✅ Export data to CSV. 
+✅ Generate an AI-written plain-English summary of your trip expenses.  
 
 
 ---
@@ -35,21 +35,21 @@ This guide assumes no prior context. Follow every step to build a working applic
 If you don't have Python installed, follow these steps:
 
 **Mac:**
-1. Go to [python.org/downloads](https://python.org/downloads)
-2. Click **Download Python 3.13.x** (the big yellow button)
-3. Open the downloaded `.pkg` file and follow the installer
-4. When done, open Terminal and run `python3 --version` to confirm
+1. Go to [python.org/downloads](https://python.org/downloads).
+2. Click **Download Python 3.13.x** (the big yellow button).
+3. Open the downloaded `.pkg` file and follow the installer.
+4. When done, open Terminal and run `python3 --version` to confirm.
 
 **Windows**:
-1. Go to [python.org/downloads](https://python.org/downloads, Download and install Python Install Manager
-2. Open Python Install Manager when installation is complete
+1. Go to [python.org/downloads](https://python.org/downloads, Download and install Python Install Manager.
+2. Open Python Install Manager when installation is complete.
 3. In the Python Install Manager window, run:
 
    ```bash
    py install 3.13
    ```
 
-4. Wait for Python 3.13 to finish installing
+4. Wait for Python 3.13 to finish installing.
 5. Open Command Prompt and run:
 
    ```bash
@@ -57,11 +57,11 @@ If you don't have Python installed, follow these steps:
    ```
 
 6. If the command is not recognized, add Python to your PATH:
-   - Open **Edit the system environment variables**
-   - Click **Environment Variables**
-   - Edit the **Path** variable
-   - Add the Python installation directory and Scripts directory
-   - restart your device
+   - Open **Edit the system environment variables**.
+   - Click **Environment Variables**.
+   - Edit the **Path** variable.
+   - Add the Python installation directory and Scripts directory.
+   - restart your device.
 7. Open a new Command Prompt and run:
 
    ```bash
@@ -100,17 +100,16 @@ to ensure Python 3.13 is used.
 
 ### Installing IBM Bob
 
-1. Search for IBM Bob online
-2. Download the IBM Bob installer for your operating system
-3. Open the installer and follow the prompts
-4. Launch Bob — you should see the Bob IDE with the chat panel on the right
+1. Search for IBM Bob online.
+2. Download the IBM Bob installer for your operating system.
+3. Open the installer and follow the prompts.
+4. Launch Bob — you should see the Bob IDE with the chat panel on the right.
 
 
 ### Required Accounts
 
 To access and use IBM watsonx products for this Bobathon, participants must create an
-IBMid to log into your IBM Cloud account. This account will provide the necessary environment
-to work with the supporting IBM products for this hackathon.
+IBMid to log into your IBM Cloud account. This account will provide the necessary environment to work with the supporting IBM products for this hackathon.
 
 - **Creating an IBMid**
 
@@ -118,7 +117,7 @@ You must have an IBMid to sign into IBM Cloud. With an IBMid, you can use your e
  to log into all IBM products and services. If you don’t have an existing
 IBMid, follow the procedure below to create one.
 1. Create an IBMid by accessing the [Create your IBM account](https://www.ibm.com/account/reg/us-en/signup?formid=urx-19776&target=https%3A%2F%2Flogin.ibm.com%2Foidc%2Fendpoint%2Fdefault%2Fauthorize%3FqsId%3Db3f11bc3-60d2-45e8-82ae-8bc09a47bcc7%26client_id%3DMyIBMLondonProdCI) page.
-2. Enter all required information in the fields provided 
+2. Enter all required information in the fields provided. 
 3. Select Next. You will receive an email from IBM Security that contains a one-time
 verification code.
 4. In the verification token field, enter the code that is provided in the email.
@@ -148,7 +147,7 @@ Before writing any code, you need three pieces of information from IBM Cloud.
 
 ### Step 1: Get IBM Cloud API Key
 
-1. Go to [cloud.ibm.com](https://cloud.ibm.com) and sign in
+1. Go to [cloud.ibm.com](https://cloud.ibm.com) and sign in.
 2. Click on the highlighted icon with the arrow. If you expand the display with the hamburger menu
 icon on the top-left, you will see this is the Resource list  
  <img width="1498" alt="Screenshot 2026-04-06 at 4 13 32 PM" src="https://github.ibm.com/user-attachments/assets/bbd382c4-e7ea-471b-a918-43b73d394a5a" />
@@ -158,26 +157,29 @@ resources. Click the resource name with the product watsonx.ai Runtime.
 
 4. Launch in IBM WatsonX
  <img width="1498" alt="ss3" src="https://github.ibm.com/user-attachments/assets/3617cf3d-b558-4947-91ce-3398a0fdb815" />
-8. Find the **Developer Access** section
+
+5. Scroll to find the **Projects** tab and click on the **+** button.
+6. Create a new project and give it a name, then click **Create**.
+7. Navigate to **Manage** and copy the **Project ID**, then save it in your notepad.
+8. In the same Manage page, click on **Services and Integration**.
+9. Click **Associate Service**, check the **watsonx Runtime** instance, and confirm.
+10. Click the three lines (hamburger menu) and click **Home**.
+11. Find the **Developer Access** section
  <img width="1498" alt="ss4" src="https://github.ibm.com/user-attachments/assets/a9bacadc-f506-4ef3-b4e7-3fdb485e1c41" />
 
-9. Give it a name (e.g., `watsonx-expense-tracker`)
-10. ⚠️ **Copy the API key immediately** — it's shown only once
-11. Save it securely (you'll paste it into `.env` later)
+12. Select your project from the dropdown.
+13. Click **Create API key** and give it a name (e.g., `watsonx-expense-tracker`).
+
+14. ⚠️ **Copy the API key immediately** — it's shown only once.
+15. Save it securely (you'll paste it into `.env` later).
 
  
 
 
 
-### Step 2: Get watsonx.ai Project ID
 
-1. At the same page of where you find the API Key
-2. Select your project from the dropdown
-3. Copy the **Project ID** (36-character UUID like `12345678-1234-1234-1234-123456789abc`)
-4. Save it securely
-5. If you want to go back IBM CLoud Dashboard, simply click the logo in the top left corner
 
-### Step 3: Note Your Region
+### Step 2: Note Your Region
 
 Your `CLOUD_URL` depends on your IBM Cloud region:
 
@@ -231,14 +233,14 @@ cd ai-travel-expense-tracker
 Create a file named `requirements.txt` with this exact content:
 
 ```
-cat > requirements.txt << 'EOF'
+
 streamlit
 pandas
 plotly
 docling
 python-dotenv
 requests
-EOF
+
 ```
 ## Step 2.5: Install Dependencies
 
@@ -256,17 +258,14 @@ pip3 install -r requirements.txt
 
 ## Step 3: Create `.env` File
 
-First, make sure you are in your project folder:
+First, make sure you are in your project folder, then create the '.env' (note the dot at the beginning) file, paste these contents: 
 ```bash
-cd ~/Desktop/ai-travel-expense-tracker
 
-Then run this command to create the file:
-cat > .env << 'EOF'
 API_KEY=paste_your_api_key_here
 PROJECT_ID=paste_your_project_id_here
 CLOUD_URL= paste_your_URL_here For example: https://us-south.ml.cloud.ibm.com
 LLM_NAME=ibm/granite-3-8b-instruct
-EOF
+
 ```
 No output means it worked. Verify the file was created:
 ```bash
@@ -275,25 +274,8 @@ cat .env
 You should see the four lines above.
 
 3d. Fill In Your Real Credentials
-Open the file in a text editor:
-```bash
-# Mac
-open -e .env
 
-# Windows
-notepad .env
-```
-Replace the placeholder values with your real credentials:
-```bash
-API_KEY=your_actual_api_key_here
-PROJECT_ID=your_actual_project_id_here
-CLOUD_URL=https://us-south.ml.cloud.ibm.com
-LLM_NAME=ibm/granite-3-8b-instruct
-```
-> ⚠️ If your file downloaded as `env (1).template` (with a number in brackets), run this instead:
-```bash
-> cp "env (1).template" .env
-```
+
 > 🔒 **Security Note**: Never commit `.env` to version control. Add it to `.gitignore`.
 
 ---
@@ -302,7 +284,6 @@ LLM_NAME=ibm/granite-3-8b-instruct
 
 This file handles the connection to watsonx.ai using the REST API.
 
-💡 Why REST API and not the SDK? The IBM watsonx-ai SDK has compatibility issues with Python 3.14. The REST API works across all supported Python versions.
 
 4a Open Bob and paste this prompt:
 
@@ -330,10 +311,7 @@ Click Apply in Bob, or copy the generated code and save it as model_gateway.py i
 
 4c: Verify your API Key
 ```bash
-curl -s -o /dev/null -w "%{http_code}" \
-  -X POST "https://iam.cloud.ibm.com/identity/token" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
+curl.exe -s -o nul -w "%{http_code}" -X POST "https://iam.cloud.ibm.com/identity/token" -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
 ```
 Replace `YOUR_API_KEY` with the value from your `.env` file.
  
@@ -398,30 +376,117 @@ Document type detection:
 - If all scores are 0, return "generic"
 - No single type has blanket priority — scoring determines winner
 
-LLM extraction:
-- Write a separate extraction prompt for each of the 5 document types (hotel, flight, meal, car, generic)
-- Each prompt must end with a literal "[" character to prime the LLM to output a JSON array directly
-- Each prompt instructs the LLM to return ONLY a valid JSON array — no markdown, no code fences, no explanation, no preamble
-- Each extracted row must have these exact fields:
-    date (YYYY-MM-DD or empty string if unknown), vendor, doc_type, category, description, currency, amount (numeric), confidence (0.0-1.0)
+LLM extraction (TWO-STEP PROCESS):
+- CRITICAL: The prompts must instruct the LLM to proceed in EXACTLY two steps:
+    STEP 1: Create a pipe-separated text table
+    STEP 2: Convert that table to JSON format
+- Implement _get_extraction_prompt(doc_type: str, text: str) -> str that returns the appropriate prompt
+- Each prompt must have this structure:
 
-- Hotel prompt must say:
-    "Extract every individual line item from this hotel folio. Each charge must be a separate JSON object.
-    Do not merge multiple charges into one row.
-    Categories: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Service Charge, Miscellaneous"
+For hotel type:
+    "Analyze this hotel invoice and extract all charges. Ignore any [image] tags.
+    
+    STEP 1: Create a table with these columns separated by | (pipe):
+    Date | Vendor | Category | Description | Currency | Amount
+    
+    Categories: Room, Food & Beverage, Parking, Spa & Wellness, Taxes & Fees, Telephone, Laundry, Minibar, Service Charge, Miscellaneous
+    
+    Rules:
+    - One line per charge
+    - Date format: YYYY-MM-DD (or leave empty if not found)
+    - Amount: numeric only (no currency symbols)
+    - Include header row
+    - Use | to separate columns
+    
+    Document:
+    {text}
+    
+    Table:
+    
+    STEP 2: Now convert the table above into a JSON array. Each row becomes a JSON object with these fields:
+    - date (from Date column)
+    - vendor (from Vendor column)
+    - doc_type (leave as empty string)
+    - category (from Category column)
+    - description (from Description column)
+    - currency (from Currency column)
+    - amount (from Amount column)
+    - confidence (set to 0.9)
+    
+    Return ONLY the JSON array with no markdown, no code fences, no explanation:
+    ["
 
-- Flight prompt categories: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Taxes & Fees, Miscellaneous
+For flight type:
+    Same structure but with categories: Airfare, Baggage Fee, Seat Upgrade, Travel Insurance, Change Fee, Taxes & Fees, Miscellaneous
 
-- Meal prompt must say:
-    "Extract each menu item or charge as a separate line item. Do not merge multiple items into one row.
-    If the invoice shows a total only, extract it as one row.
-    Categories: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Taxes & Fees, Gratuity, Miscellaneous"
+For meal type:
+    "Analyze this restaurant invoice and extract all charges. Ignore any [image] tags.
+    
+    STEP 1: Create a table with these columns separated by | (pipe):
+    Date | Vendor | Category | Description | Currency | Amount
+    
+    Categories: Breakfast, Lunch, Dinner, Coffee & Snacks, Alcohol, Taxes & Fees, Gratuity, Miscellaneous
+    
+    Rules:
+    - One line per item/charge
+    - Date format: YYYY-MM-DD (or leave empty if not found)
+    - Amount: numeric only (no currency symbols)
+    - Include header row
+    - Use | to separate columns
+    
+    Document:
+    {text}
+    
+    Table:
+    
+    STEP 2: Now convert the table above into a JSON array. Each row becomes a JSON object with these fields:
+    - date (from Date column)
+    - vendor (from Vendor column)
+    - doc_type (leave as empty string)
+    - category (from Category column)
+    - description (from Description column)
+    - currency (from Currency column)
+    - amount (from Amount column)
+    - confidence (set to 0.9)
+    
+    Return ONLY the JSON array with no markdown, no code fences, no explanation:
+    ["
 
-- Car prompt categories: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Service Charge, Miscellaneous
+For car type:
+    Same structure but with categories: Base Rental, Fuel, Insurance, Toll Charges, GPS & Equipment, Taxes & Fees, Service Charge, Miscellaneous
 
-- Generic prompt must say:
-    "Extract ALL line items. For each row, detect doc_type from the content — must be one of: Hotel, Flight, Meal, Car Rental.
-    Use all categories from all 4 types combined."
+For generic type:
+    "Analyze this invoice and extract all charges. Ignore any [image] tags.
+    
+    STEP 1: Create a table with these columns separated by | (pipe):
+    Date | Vendor | Category | Description | Currency | Amount
+    
+    Categories: Room, Food & Beverage, Parking, Airfare, Baggage Fee, Breakfast, Lunch, Dinner, Base Rental, Fuel, Insurance, Taxes & Fees, Miscellaneous
+    
+    Rules:
+    - One line per charge
+    - Date format: YYYY-MM-DD (or leave empty if not found)
+    - Amount: numeric only (no currency symbols)
+    - Include header row
+    - Use | to separate columns
+    
+    Document:
+    {text}
+    
+    Table:
+    
+    STEP 2: Now convert the table above into a JSON array. Each row becomes a JSON object with these fields:
+    - date (from Date column)
+    - vendor (from Vendor column)
+    - doc_type (leave as empty string)
+    - category (from Category column)
+    - description (from Description column)
+    - currency (from Currency column)
+    - amount (from Amount column)
+    - confidence (set to 0.9)
+    
+    Return ONLY the JSON array with no markdown, no code fences, no explanation:
+    ["
 
 Vendor extraction:
 - Implement _extract_vendor_from_text(text: str) -> str
@@ -678,10 +743,7 @@ python3 --version
 ### 2. Test API Key
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" \
-  -X POST "https://iam.cloud.ibm.com/identity/token" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
+curl.exe -s -o nul -w "%{http_code}" -X POST "https://iam.cloud.ibm.com/identity/token" -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
 ```
 
 Replace `YOUR_API_KEY` with your actual key. Expected output: `200`
@@ -698,23 +760,7 @@ python3 -c "import streamlit, pandas, plotly, docling, requests, dotenv; print('
 
 ---
 
-## Install Dependencies
 
-### Python 3.10–3.13
-
-```bash
-pip install -r requirements.txt
-```
-
-### Python 3.14
-
-```bash
-pip install uv
-uv pip install pillow==11.3.0 --only-binary :all:
-uv pip install -r requirements.txt
-```
-
----
 
 ## Run the Application
 
