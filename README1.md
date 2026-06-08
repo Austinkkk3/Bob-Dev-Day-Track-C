@@ -41,7 +41,7 @@ right now inside IBM.
 
 ## Get Started
 
-👉 **[Open the Lab Guide →](BUILD_GUIDE_SIMPLE.md)**
+👉 **[Open the Lab Guide →](Lab 1 Build Guide.md)**
 
 ---
 
