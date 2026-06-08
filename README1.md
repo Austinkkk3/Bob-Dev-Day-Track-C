@@ -34,7 +34,7 @@ AI-assisted development looks like in practice.
 ## The Best Part
 
 By the end of this lab, you'll have a working app you built yourself
-from scratch, in under 2 hours， using AI tools that are available to you
+from scratch, in under 2 hours, using AI tools that are available to you
 right now inside IBM.
 
 ---
