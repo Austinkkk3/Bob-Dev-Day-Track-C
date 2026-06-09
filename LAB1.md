@@ -14,7 +14,7 @@ This guide assumes no prior context. Follow every step to build a working applic
 ✅ Display results in a table with 8 columns.   
 ✅ Show 4 metric cards (Files Processed, Line Items, Total Amount, Avg Confidence).  
 ✅ Generate 4 interactive Plotly charts (by vendor, by category, by document type).  
-✅ Export data to CSV. 
+✅ Export data to CSV.   
 ✅ Generate an AI-written plain-English summary of your trip expenses.  
 
 
