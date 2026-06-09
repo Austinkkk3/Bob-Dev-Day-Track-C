@@ -8,10 +8,10 @@ This guide assumes no prior context. Follow every step to build a working applic
 
 ## What This Application Does
 
-✅ Upload up to 10 PDF receipts (hotels, flights, meals, car rentals). 
-✅ Auto-detect document type from filename.
-✅ Extract structured expense data using IBM watsonx.ai Granite 3 LLM. 
-✅ Display results in a table with 8 columns. 
+✅ Upload up to 10 PDF receipts (hotels, flights, meals, car rentals).  
+✅ Auto-detect document type from filename.  
+✅ Extract structured expense data using IBM watsonx.ai Granite 3 LLM.   
+✅ Display results in a table with 8 columns.   
 ✅ Show 4 metric cards (Files Processed, Line Items, Total Amount, Avg Confidence).  
 ✅ Generate 4 interactive Plotly charts (by vendor, by category, by document type).  
 ✅ Export data to CSV. 
