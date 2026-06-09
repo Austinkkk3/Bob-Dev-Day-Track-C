@@ -247,11 +247,6 @@ requests
 After creating requirements.txt, install the packages:
 
 ```bash
-pip install -r requirements.txt
-```
-If you get ModuleNotFoundError when running the app later, try:
-
-```bash
 pip3 install -r requirements.txt
 ```
 ---
@@ -310,10 +305,15 @@ Return only the complete Python file with no explanations.
 Click Apply in Bob, or copy the generated code and save it as model_gateway.py in your project folder.
 
 4c: Verify your API Key
+### For Windows###
 ```bash
 curl.exe -s -o nul -w "%{http_code}" -X POST "https://iam.cloud.ibm.com/identity/token" -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
 ```
-Replace `YOUR_API_KEY` with the value from your `.env` file.
+### For Mac###
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X POST "https://iam.cloud.ibm.com/identity/token" -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=YOUR_API_KEY"
+```
+❕Replace `YOUR_API_KEY` with the value from your `.env` file.
  
 | Output | Meaning |
 |--------|---------|
