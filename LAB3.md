@@ -40,7 +40,7 @@ Tell Bob what you want in plain English — here are some ideas:
 ### How to Use Bob for This
 
 1. Open Bob → switch to **Ask Mode**
-2. <img width="1157" alt="Ask bib" src="https://github.ibm.com/user-attachments/assets/17e155c2-1352-4e45-8803-960c335ce1ca" />
+2. <img width="981" height="691" alt="Screenshot 2026-06-11 at 2 26 33 PM" src="https://github.com/user-attachments/assets/8987e26a-8bc3-4ca8-b57e-4c7a62ce3997" />
 
 3. Describe what you want — be as specific or as vague as you like
 4. Review what Bob suggests, ask follow-up questions, iterate
