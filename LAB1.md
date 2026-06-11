@@ -155,23 +155,36 @@ icon on the top-left, you will see this is the Resource list
 resources. Click the resource name with the product watsonx.ai Runtime.
 <img width="1151" alt="runtime" src="https://github.ibm.com/user-attachments/assets/d377fc86-6668-45ef-91f8-24d618af412b" />
 
+ or
+ 
+<img width="1512" alt="Untitled" src="https://github.ibm.com/user-attachments/assets/bd375f8b-b3ec-40b5-9993-07661ada1b97" />
+
+
 4. Launch in IBM WatsonX
  <img width="1498" alt="ss3" src="https://github.ibm.com/user-attachments/assets/3617cf3d-b558-4947-91ce-3398a0fdb815" />
 
-5. Scroll to find the **Projects** tab and click on the **+** button.
-6. Create a new project and give it a name, then click **Create**.
-7. Navigate to **Manage** and copy the **Project ID**, then save it in your notepad.
-8. In the same Manage page, click on **Services and Integration**.
-9. Click **Associate Service**, check the **watsonx Runtime** instance, and confirm.
-10. Click the three lines (hamburger menu) and click **Home**.
-11. Find the **Developer Access** section
+5. Scroll to find the **Projects** tab.
+6. <img width="1512" alt="project screenshoot" src="https://github.ibm.com/user-attachments/assets/530c08c0-5b75-4d9e-ae32-be9e464312dd" />
+
+7. Create a new project and give it a name, then click **Create**.
+8. Scroll down to find **Storage Service** (Pick the same one as your resource name)
+9.  <img width="1512" alt="Untitled1" src="https://github.ibm.com/user-attachments/assets/42179aad-da9d-45b7-93c5-f0f30fe945d7" />
+10. Navigate to **Manage** and copy the **Project ID**, then save it in your notepad.
+11. In the same Manage page, click on **Services and Integration**.
+12. <img width="1512" alt="Untitled3" src="https://github.ibm.com/user-attachments/assets/919149f3-c306-4f9d-a5f5-c91e2023a81a" />
+
+13. Click **Associate Service**, check the **watsonx Runtime** instance (Pick the same one as your resouce name), and confirm.
+14. <img width="1512" alt="Untitled4" src="https://github.ibm.com/user-attachments/assets/17e2d964-f701-4f27-9e17-77288afd92df" />
+
+15. Click the three lines (hamburger menu) and click **Home**.
+16. Find the **Developer Access** section
  <img width="1498" alt="ss4" src="https://github.ibm.com/user-attachments/assets/a9bacadc-f506-4ef3-b4e7-3fdb485e1c41" />
 
-12. Select your project from the dropdown.
-13. Click **Create API key** and give it a name (e.g., `watsonx-expense-tracker`).
+17. Select your project from the dropdown.
+18. Click **Create API key** and give it a name (e.g., `watsonx-expense-tracker`).
 
-14. ⚠️ **Copy the API key immediately** — it's shown only once.
-15. Save it securely (you'll paste it into `.env` later).
+19. ⚠️ **Copy the API key immediately** — it's shown only once.
+20. Save it securely (you'll paste it into `.env` later).
 
  
 
